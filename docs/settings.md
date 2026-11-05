@@ -57,8 +57,6 @@ Each fires once per metric per reset window. Click one to open All Usage.
 
 - **Hide From Screen Share.** Shows the app icon instead of your usage while your screen is
   shared or recorded. Off by default.
-- **Help Make Brim Better.** Sends optional daily account counts by provider. The daily active
-  ping and crash reports don't depend on it.
 
 See [Privacy](privacy.md).
 
@@ -73,15 +71,6 @@ See [Privacy](privacy.md).
 
 - **Log Level.** Error, Warning, Info (default), or Debug. Choose Debug while you reproduce a
   problem. See [Debugging](debugging.md).
-
-## Updates
-
-- **Check Automatically.** Checks about once an hour and shows **Update Available** on the
-  dashboard.
-- **Beta Updates.** Includes pre-release builds.
-- **Check for Updates…** checks now.
-
-The dev build disables these. See Updates.
 
 ## Upgrading from 0.7.x
 

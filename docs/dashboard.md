@@ -134,7 +134,7 @@ Updates.
   down to the next refresh. Click it or press **⌘R** to refresh now. A dev build shows its commit,
   like `dev (abc1234)`.
 - On Priority, a button copies the tab as a PNG with emails hidden.
-- The **⋯** menu has **Accounts**, **Settings**, **Check for Updates…**, **Report an Issue…**,
+- The **⋯** menu has **Accounts**, **Settings**, **Report an Issue…**,
   **About Brim**, and **Quit Brim**.
 
 ## Keyboard

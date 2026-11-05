@@ -57,7 +57,7 @@ script/test_quiet.sh [--filter <Suite>]
 windows, and the script runs it niced, keeps it from taking the keyboard or the screen, and fails the
 run if a test process ever came to the front. The rename-focus tests need a key window and the Options
 menu test shows a real menu, so they skip unless `OPENUSAGE_FOCUS_TESTS=1`; run them with
-`swift test --filter 'InlineRenameFocusTests|UpdateControlsTests'` on a Mac nobody is typing on after
+`swift test --filter 'InlineRenameFocusTests'` on a Mac nobody is typing on after
 every change to a header, to renaming, or to the Options menu, or they rot unseen.
 
 There is no hot reload. The app is a long-lived menu-bar process, so **every code change requires a
