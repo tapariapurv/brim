@@ -9,7 +9,7 @@ A native macOS menu-bar app for your AI usage limits, in Liquid Glass.
 ## What Brim changes
 
 - **Liquid Glass throughout.** Requires macOS 26 or later.
-- **Backgrounds.** Liquid Fill (rises with your most-used limit), Aurora, Sunset or None, in Settings > Display.
+- **Backgrounds.** Liquid Fill (rises with your most-used limit), Aurora, Sunset or None, in Settings > General.
 - **Your refresh interval.** 1 minute to 1 hour, in Settings > General.
 - **Fewer blocked Claude refreshes.** See below.
 - **No analytics and no auto-updates.** Brim sends nothing to the original project. Update by rebuilding.

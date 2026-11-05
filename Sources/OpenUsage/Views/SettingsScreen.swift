@@ -70,6 +70,9 @@ struct SettingsScreen: View {
             }
         }
         .onChange(of: defaultTab) { _, newValue in popover.dashboardTab = newValue }
+        Section("Look") {
+            picker("Background", selection: $backdrop, options: BackdropStyle.allCases.map { ($0, $0.label) })
+        }
         Section("Refresh") {
             picker(
                 "Refresh Every",
@@ -89,9 +92,6 @@ struct SettingsScreen: View {
     @ViewBuilder
     private var displayTab: some View {
         @Bindable var dataStore = dataStore
-        Section {
-            picker("Background", selection: $backdrop, options: BackdropStyle.allCases.map { ($0, $0.label) })
-        }
         Section {
             PriorityIconsPreview()
             picker("Show In Menu Bar", selection: $dataStore.menuBarLimit, options: MenuBarLimit.allCases.map { ($0, $0.label) })
