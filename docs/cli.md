@@ -5,9 +5,9 @@ reads a credential, or launches the app. The app fetches every 5 minutes while i
 [Refreshing](refreshing.md)).
 
 ```sh
-openusage                  # every account
-openusage codex            # every ChatGPT account (the provider id stays codex)
-openusage codex@1a2b3c4d   # one account, by its id
+brim                  # every account
+brim codex            # every ChatGPT account (the provider id stays codex)
+brim codex@1a2b3c4d   # one account, by its id
 ```
 
 - The argument is an account id (the `providers` key in the output) or a provider kind: `claude`,

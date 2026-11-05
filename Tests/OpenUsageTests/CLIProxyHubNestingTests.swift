@@ -130,6 +130,7 @@ final class CLIProxyHubNestingTests: QuietWindowTestCase {
             .environment(container.dataStore)
             .environment(container.renaming)
             .environment(\.colorScheme, .light)
+            .background(.white) // The panel is glass now, and this capture doesn't draw glass.
         let (window, host) = show(view, in: .borderless, size: CGSize(width: PanelMetrics.width, height: 640))
         defer { window.close() }
         try await Task.sleep(for: .milliseconds(400))
