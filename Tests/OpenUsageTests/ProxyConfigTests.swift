@@ -120,7 +120,7 @@ private final class FakeProxy: @unchecked Sendable {
         parameters.requiredLocalEndpoint = .hostPort(host: .ipv4(.loopback), port: .any)
         let listener = try NWListener(using: parameters)
         let received = OSAllocatedUnfairLock<[Data]>(initialState: [])
-        let queue = DispatchQueue(label: "com.robinebers.openusage.tests.fake-proxy")
+        let queue = DispatchQueue(label: "com.tapariapurv.brim.tests.fake-proxy")
         listener.newConnectionHandler = { connection in
             connection.start(queue: queue)
             connection.receive(minimumIncompleteLength: 1, maximumLength: 65_536) { data, _, _, _ in

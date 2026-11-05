@@ -142,7 +142,7 @@ final class AccountStore {
                     guard try credentialVault.load(account.id)?.identity == identity else { continue }
                 } catch {
                     AppLog.error(.auth, "\(account.cardID) could not check its Keychain item for a duplicate sign-in: \(error.localizedDescription)")
-                    throw ProviderError.unavailable("OpenUsage couldn't check the saved sign-in for \(account.label). Check Keychain access and try again.")
+                    throw ProviderError.unavailable("Brim couldn't check the saved sign-in for \(account.label). Check Keychain access and try again.")
                 }
             }
             throw ProviderError.unavailable("This account is already added as \(account.label).")
@@ -232,7 +232,7 @@ final class AccountStore {
         didChange?()
         if let failure = failures.first {
             AppLog.error(LogTag.auth("cliproxy"), "could not save \(failures.count) of \(hub.host)'s logins in the Keychain: \(failure.localizedDescription)")
-            throw ProviderError.unavailable("OpenUsage couldn’t save this hub’s logins in the Keychain. It tries again when Accounts opens.")
+            throw ProviderError.unavailable("Brim couldn’t save this hub’s logins in the Keychain. It tries again when Accounts opens.")
         }
     }
 

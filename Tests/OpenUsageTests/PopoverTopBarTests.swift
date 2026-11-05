@@ -24,7 +24,6 @@ final class PopoverTopBarTests: QuietWindowTestCase {
             .environment(popover)
             .environment(container.dataStore)
             .environment(container.renaming)
-            .environment(UpdaterController())
         let (window, host) = show(view, in: .titled, size: CGSize(width: PanelMetrics.width, height: 300))
         XCTAssertNil(window.attachedSheet)
 

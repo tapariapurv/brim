@@ -5,7 +5,6 @@ struct PopoverFooter: View {
     @Environment(PopoverState.self) private var popover
     @Environment(WidgetDataStore.self) private var dataStore
     @Environment(LayoutStore.self) private var layout
-    @Environment(UpdaterController.self) private var updater
     @Environment(\.colorScheme) private var colorScheme
     let screen: PopoverScreen
 
@@ -70,9 +69,7 @@ struct PopoverFooter: View {
         .accessibilityLabel("Copy Priority Screenshot")
     }
 
-    /// The Options pull-down behind a round button. Check for Updates… stays listed on every build and
-    /// disables itself while Sparkle can't check: a dev build with no feed, or a check already running.
-    /// Accounts and Settings carry their key equivalents
+    /// The Options pull-down behind a round button. Accounts and Settings carry their key equivalents
     /// only as labels: while the menu is closed `PopoverKeyReader` handles (and consumes) them first, so
     /// they can't double-fire. ⌘Q is unowned elsewhere, so it rides its menu item directly.
     private var optionsMenu: some View {
@@ -89,22 +86,15 @@ struct PopoverFooter: View {
 
             Divider()
 
-            Button { updater.checkForUpdates() } label: {
-                Label("Check for Updates…", systemImage: "arrow.triangle.2.circlepath")
-            }
-            .disabled(!updater.canCheckForUpdates)
-
-            Divider()
-
-            Link(destination: URL(string: "https://github.com/robinebers/openusage/issues/new/choose")!) {
+            Link(destination: URL(string: "https://github.com/tapariapurv/brim/issues/new")!) {
                 Label("Report an Issue…", systemImage: "ladybug")
             }
 
             Button { AboutPanel.present() } label: {
-                Label("About OpenUsage", systemImage: "info.circle")
+                Label("About Brim", systemImage: "info.circle")
             }
             Button(role: .destructive) { NSApplication.shared.terminate(nil) } label: {
-                Label("Quit OpenUsage", systemImage: "power")
+                Label("Quit Brim", systemImage: "power")
             }
             .keyboardShortcut("q")
         } label: {
@@ -133,7 +123,7 @@ struct PopoverFooter: View {
     /// The version over the refresh countdown, as 0.7 showed them.
     private var footerIdentity: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("OpenUsage \(AppInfo.version)")
+            Text("Brim \(AppInfo.version)")
             if !layout.displayGroups.isEmpty { nextUpdateButton }
         }
         .font(.caption2)

@@ -5,7 +5,6 @@ struct SettingsScreen: View {
     @Environment(AppContainer.self) private var container
     @Environment(PopoverState.self) private var popover
     @Environment(WidgetDataStore.self) private var dataStore
-    @Environment(UpdaterController.self) private var updater
     @AppStorage(AppearanceSetting.key) private var appearance = AppearanceSetting.system
     @AppStorage(TimeFormatSetting.key) private var timeFormat = TimeFormatSetting.auto
     @AppStorage(DashboardTab.defaultKey) private var defaultTab = DashboardTab.priority
@@ -67,23 +66,6 @@ struct SettingsScreen: View {
             }
         }
         .onChange(of: defaultTab) { _, newValue in popover.dashboardTab = newValue }
-        updatesSection
-    }
-
-    @ViewBuilder
-    private var updatesSection: some View {
-        @Bindable var updater = updater
-        Section("Updates") {
-            Toggle("Check Automatically", isOn: $updater.automaticallyChecksForUpdates)
-                .disabled(!updater.isActive)
-            Toggle("Beta Updates", isOn: $updater.betaChannelEnabled)
-                .disabled(!updater.isActive)
-            HStack {
-                Spacer(minLength: 0)
-                Button("Check for Updates…") { updater.checkForUpdates() }
-                    .disabled(!updater.canCheckForUpdates)
-            }
-        }
     }
 
     @ViewBuilder
@@ -139,7 +121,7 @@ struct SettingsScreen: View {
             Text("Notifications")
         } footer: {
             if notificationsDenied {
-                Text("Notifications are off for OpenUsage in [System Settings](x-apple.systempreferences:com.apple.Notifications-Settings.extension).")
+                Text("Notifications are off for Brim in [System Settings](x-apple.systempreferences:com.apple.Notifications-Settings.extension).")
                     .font(.system(size: 11))
                     .foregroundStyle(Theme.notice)
             }
@@ -151,16 +133,11 @@ struct SettingsScreen: View {
         @Bindable var hideFromScreenShare = container.hideFromScreenShare
         Section {
             Toggle("Hide From Screen Share", isOn: $hideFromScreenShare.isEnabled)
-            Toggle("Help Make OpenUsage Better", isOn: Binding(
-                get: { container.telemetry.isEnabled },
-                set: { container.telemetry.setEnabled($0) }
-            ))
         } header: {
             Text("Privacy")
         } footer: {
             VStack(alignment: .leading, spacing: 4) {
                 SettingsNote("While your screen is shared or recorded, the menu bar shows the app icon instead of your usage.")
-                SettingsNote("Share additional anonymous usage stats that tell the team where to improve.")
             }
         }
         Section {
@@ -179,13 +156,13 @@ struct SettingsScreen: View {
             Text("Command Line")
         } footer: {
             VStack(alignment: .leading, spacing: 4) {
-                SettingsNote("Adds a global `openusage` command that prints the usage the app last fetched.")
+                SettingsNote("Adds a global `brim` command that prints the usage the app last fetched.")
                 if commandLineTool.status == .conflict {
-                    SettingsNote("\(commandLineTool.destinationPath) already exists and wasn't installed by OpenUsage.", isWarning: true)
+                    SettingsNote("\(commandLineTool.destinationPath) already exists and wasn't installed by Brim.", isWarning: true)
                 } else if let errorMessage = commandLineTool.errorMessage {
                     SettingsNote(errorMessage, isWarning: true)
                 } else if case .linkedToAnotherCopy = commandLineTool.status {
-                    SettingsNote("\(commandLineTool.destinationPath) points at another copy of OpenUsage. Install points it at this one.")
+                    SettingsNote("\(commandLineTool.destinationPath) points at another copy of Brim. Install points it at this one.")
                 }
             }
         }
@@ -194,7 +171,7 @@ struct SettingsScreen: View {
         } header: {
             Text("Debug")
         } footer: {
-            SettingsNote("How much detail OpenUsage writes to the macOS log. Choose Debug while you reproduce a problem.")
+            SettingsNote("How much detail Brim writes to the macOS log. Choose Debug while you reproduce a problem.")
         }
     }
 

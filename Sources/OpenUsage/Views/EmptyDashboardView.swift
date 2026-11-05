@@ -9,8 +9,8 @@ struct EmptyDashboardView: View {
     /// 0.7.x release stamps `openusage.settings.schemaVersion` at launch, and this build never writes it.
     var copy: (title: String, message: String) {
         defaults.object(forKey: "openusage.settings.schemaVersion") != nil
-            ? ("Welcome Back", "OpenUsage no longer reads your local accounts automatically. Add back any account you'd like it to track. Even multiple of the same provider!")
-            : ("Add an Account", "OpenUsage tracks however many accounts you'd like to monitor. Just add them and they'll show right up, even multiple of the same provider!")
+            ? ("Welcome Back", "Brim no longer reads your local accounts automatically. Add back any account you'd like it to track. Even multiple of the same provider!")
+            : ("Add an Account", "Brim tracks however many accounts you'd like to monitor. Just add them and they'll show right up, even multiple of the same provider!")
     }
 
     var body: some View {

@@ -6,7 +6,6 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
     private var container: AppContainer?
     private var statusItemController: StatusItemController?
     private var singleInstanceLock: SingleInstanceLock.Token?
-    private let updater = UpdaterController()
 
     public func applicationDidFinishLaunching(_ notification: Notification) {
         AppLog.bootstrap()
@@ -31,14 +30,13 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         NSApp.disableRelaunchOnLogin()
         AppearanceSetting.applyCurrent()
-        let container = AppContainer(telemetry: PostHogTelemetrySink(), telemetryDefaults: TelemetryRecorder.suite)
+        let container = AppContainer(telemetry: NoTelemetrySink(), telemetryDefaults: TelemetryRecorder.suite)
         self.container = container
         container.startRefreshing()
         Task { await APIKeyV1Files.importOnce(into: container.accounts) }
-        statusItemController = StatusItemController(container: container, updater: updater)
+        statusItemController = StatusItemController(container: container)
         let launchDurationMS = Int((ProcessInfo.processInfo.systemUptime - processStartedAt) * 1_000)
         AppLog.info(.lifecycle, "launch to status item ready: \(launchDurationMS) ms")
-        updater.start()
     }
 
     public func applicationWillTerminate(_ notification: Notification) {

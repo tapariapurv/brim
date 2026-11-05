@@ -22,7 +22,7 @@ final class SecondaryReadCadenceTests: XCTestCase {
     func testTheLiveResetCountWinsOverTheHourlyListAndKeepsItsExpiriesOnlyWhileTheyAgree() async throws {
         let expiry = OpenUsageISO8601.string(from: start.addingTimeInterval(3 * 86_400))
         let cases: [(name: String, dedicated: Int, live: Int, expiries: Int)] = [
-            ("spent outside OpenUsage", 1, 0, 0),
+            ("spent outside Brim", 1, 0, 0),
             ("granted since the hourly read", 0, 1, 0),
             ("unchanged", 1, 1, 1)
         ]

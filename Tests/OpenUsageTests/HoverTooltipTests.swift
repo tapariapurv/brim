@@ -35,7 +35,7 @@ final class HoverTooltipTests: QuietWindowTestCase {
         XCTAssertLessThan(single.height, 30, "one line")
         XCTAssertEqual(single.width, oneLineWidth(short) + 16, accuracy: 2, "as wide as its text")
 
-        let long = "OpenUsage intelligently displays the usage icons at risk of running out and that require your attention."
+        let long = "Brim intelligently displays the usage icons at risk of running out and that require your attention."
         let wrapped = try await shownTooltip(long)
         XCTAssertLessThanOrEqual(wrapped.width, 280)
         let lines = (oneLineWidth(long) / (280 - 16)).rounded(.up)

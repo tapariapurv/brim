@@ -37,7 +37,7 @@ final class DuplicateLoginTests: XCTestCase {
         flow.choose(.claude)
         try await waitUntil { flow.isFinished || flow.errorMessage != nil }
 
-        XCTAssertEqual(flow.errorMessage, "OpenUsage couldn't check the saved sign-in for Work. Check Keychain access and try again.")
+        XCTAssertEqual(flow.errorMessage, "Brim couldn't check the saved sign-in for Work. Check Keychain access and try again.")
         XCTAssertEqual(store.accounts.map(\.label), ["Work"])
     }
 

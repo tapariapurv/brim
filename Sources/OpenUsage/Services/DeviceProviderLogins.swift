@@ -25,14 +25,14 @@ struct CopilotLogin: ProviderLogin {
             tokenURL: domain.webURL("/login/oauth/access_token"),
             clientID: Self.clientID,
             scopes: Self.scopes,
-            headers: ["User-Agent": "OpenUsage"],
+            headers: ["User-Agent": "Brim"],
             deniedMessage: "GitHub device sign-in was denied.",
             http: http,
             prompt: prompt
         )
         let profile = try await LoginHTTP.get(domain.apiURL("/user"), bearerToken: token.accessToken, using: http, headers: [
             "Accept": "application/vnd.github+json",
-            "User-Agent": "OpenUsage",
+            "User-Agent": "Brim",
             "X-GitHub-Api-Version": "2022-11-28"
         ])
         let user = try LoginHTTP.decode(GitHubUser.self, from: profile)

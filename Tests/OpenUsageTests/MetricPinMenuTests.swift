@@ -44,7 +44,6 @@ final class MetricPinMenuTests: QuietWindowTestCase {
             .environment(container.popover)
             .environment(container.dataStore)
             .environment(container.renaming)
-            .environment(UpdaterController())
             .environment(\.colorScheme, .light)
         let (window, host) = show(view, in: .titled, size: CGSize(width: PanelMetrics.width, height: 400))
         let hosted = Hosted(

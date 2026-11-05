@@ -35,7 +35,7 @@ enum SingleInstanceLock {
             return .failed("Application Support directory unavailable")
         }
         let lockURL = appSupport
-            .appendingPathComponent("OpenUsage", isDirectory: true)
+            .appendingPathComponent("Brim", isDirectory: true)
             .appendingPathComponent("\(bundleIdentifier).lock")
         return acquire(at: lockURL)
     }

@@ -29,7 +29,7 @@ final class SingleInstanceLockTests: XCTestCase {
     private func makeLockURL() -> URL {
         FileManager.default.temporaryDirectory
             .appendingPathComponent("openusage-lock-\(UUID().uuidString)", isDirectory: true)
-            .appendingPathComponent("OpenUsage.lock")
+            .appendingPathComponent("Brim.lock")
     }
 
     private func assertAlreadyRunning(

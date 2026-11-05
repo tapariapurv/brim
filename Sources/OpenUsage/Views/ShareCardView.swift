@@ -80,7 +80,7 @@ private struct ShareCardFrame<Content: View>: View {
         HStack(spacing: 6) {
             Image(nsImage: ProviderMarks.image(for: "openusage", side: 16, inset: 0))
                 .renderingMode(.template)
-            Text("OpenUsage")
+            Text("Brim")
                 .font(.system(size: 13, weight: .semibold))
             Spacer(minLength: 8)
             Text("Your AI Limits at a Glance")

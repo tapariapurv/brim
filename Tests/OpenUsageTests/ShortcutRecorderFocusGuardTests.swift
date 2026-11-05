@@ -89,7 +89,6 @@ final class ShortcutRecorderFocusGuardTests: QuietWindowTestCase {
             .environment(container.layout)
             .environment(container.popover)
             .environment(container.dataStore)
-            .environment(UpdaterController()),
             size: CGSize(width: PanelMetrics.width, height: 500))
         try await Task.sleep(for: .milliseconds(300))
         return (container, window, host)

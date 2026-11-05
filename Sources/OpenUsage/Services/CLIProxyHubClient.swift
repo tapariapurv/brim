@@ -14,8 +14,8 @@ struct CLIProxyHubClient: Sendable {
         do {
             return try HubLogin.listing(from: response.body)
         } catch {
-            AppLog.error(LogTag.auth("cliproxy"), "\(CLIProxyHub.host(of: url)) sent a login listing OpenUsage can't read")
-            throw ProviderError.unavailable("The CLIProxyAPI hub at \(CLIProxyHub.host(of: url)) sent a login list OpenUsage can't read.")
+            AppLog.error(LogTag.auth("cliproxy"), "\(CLIProxyHub.host(of: url)) sent a login listing Brim can't read")
+            throw ProviderError.unavailable("The CLIProxyAPI hub at \(CLIProxyHub.host(of: url)) sent a login list Brim can't read.")
         }
     }
 
@@ -45,7 +45,7 @@ struct CLIProxyHubClient: Sendable {
             body: try JSONSerialization.data(withJSONObject: payload), timeout: request.timeout + 10, upstream: upstream
         )
         guard let upstreamResponse = Self.unwrap(response.body) else {
-            AppLog.error(LogTag.auth("cliproxy"), "\(link.host) sent an api-call answer OpenUsage can't read")
+            AppLog.error(LogTag.auth("cliproxy"), "\(link.host) sent an api-call answer Brim can't read")
             throw ProviderError.invalidResponse
         }
         return upstreamResponse
@@ -87,7 +87,7 @@ struct CLIProxyHubClient: Sendable {
         let host = CLIProxyHub.host(of: url)
         guard CLIProxyHub.allowsKey(at: url) else {
             AppLog.error(LogTag.auth("cliproxy"), "\(host) is plain http outside this Mac, the local network, and Tailscale; not sending the management key")
-            throw ProviderError.unavailable("Use https for \(host). OpenUsage uses http only for a hub on this Mac, your local network, or Tailscale.")
+            throw ProviderError.unavailable("Use https for \(host). Brim uses http only for a hub on this Mac, your local network, or Tailscale.")
         }
         let response: HTTPResponse
         do {

@@ -6,7 +6,7 @@ import XCTest
 final class CommandLineToolInstallerTests: XCTestCase {
     private func fixture() throws -> (root: URL, source: String, destination: String) {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        let source = root.appendingPathComponent("OpenUsage.app/Contents/Helpers/openusage")
+        let source = root.appendingPathComponent("Brim.app/Contents/Helpers/brim")
         let destination = root.appendingPathComponent("bin/openusage")
         try FileManager.default.createDirectory(at: source.deletingLastPathComponent(), withIntermediateDirectories: true)
         try Data().write(to: source)
@@ -47,10 +47,10 @@ final class CommandLineToolInstallerTests: XCTestCase {
     }
 
     func testALinkFromAnotherCopyOfOpenUsageIsReplacedOnInstall() throws {
-        for other in ["Applications/OpenUsage.app", "Downloads/OpenUsage 0.7.16.app", "moved-away/OpenUsage.app"] {
+        for other in ["Applications/Brim.app", "Downloads/Brim 0.7.16.app", "moved-away/Brim.app"] {
             let fixture = try fixture()
             defer { try? FileManager.default.removeItem(at: fixture.root) }
-            let otherHelper = fixture.root.appendingPathComponent("\(other)/Contents/Helpers/openusage").path
+            let otherHelper = fixture.root.appendingPathComponent("\(other)/Contents/Helpers/brim").path
             if !other.hasPrefix("moved-away") {
                 try FileManager.default.createDirectory(atPath: (otherHelper as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
                 try Data().write(to: URL(fileURLWithPath: otherHelper))
@@ -90,7 +90,7 @@ final class CommandLineToolInstallerTests: XCTestCase {
     func testAFailedInstallOverAnotherCopysLinkKeepsTheStatusAndReportsTheError() throws {
         let fixture = try fixture()
         defer { try? FileManager.default.removeItem(at: fixture.root) }
-        let otherHelper = fixture.root.appendingPathComponent("Applications/OpenUsage.app/Contents/Helpers/openusage").path
+        let otherHelper = fixture.root.appendingPathComponent("Applications/Brim.app/Contents/Helpers/brim").path
         try FileManager.default.createDirectory(atPath: (fixture.destination as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
         try FileManager.default.createSymbolicLink(atPath: fixture.destination, withDestinationPath: otherHelper)
         let installer = CommandLineToolInstaller(sourcePath: fixture.source, destinationPath: fixture.destination) { _, _, _ in .failure("x") }
@@ -105,7 +105,7 @@ final class CommandLineToolInstallerTests: XCTestCase {
         let fixture = try fixture()
         defer { try? FileManager.default.removeItem(at: fixture.root) }
         try FileManager.default.createDirectory(atPath: (fixture.destination as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
-        for foreign in [fixture.root.appendingPathComponent("Applications/Usage.app/Contents/Helpers/openusage").path, "/tmp/another-openusage"] {
+        for foreign in [fixture.root.appendingPathComponent("Applications/Usage.app/Contents/Helpers/brim").path, "/tmp/another-openusage"] {
             try? FileManager.default.removeItem(atPath: fixture.destination)
             try FileManager.default.createSymbolicLink(atPath: fixture.destination, withDestinationPath: foreign)
             var operationRan = false
@@ -127,13 +127,13 @@ final class CommandLineToolInstallerTests: XCTestCase {
     }
 
     func testTheHelperRuleNamesOnlyOpenUsageBundles() {
-        XCTAssertTrue(CommandLineToolInstaller.isOpenUsageHelper("/Applications/OpenUsage.app/Contents/Helpers/openusage"))
-        XCTAssertTrue(CommandLineToolInstaller.isOpenUsageHelper("/Users/me/Dev/openusage/dist/OpenUsage.app/Contents/Helpers/openusage"))
-        XCTAssertTrue(CommandLineToolInstaller.isOpenUsageHelper("/Applications/OpenUsage Beta.app/Contents/Helpers/openusage"))
-        XCTAssertFalse(CommandLineToolInstaller.isOpenUsageHelper("/Applications/OpenUsage.app/Contents/MacOS/openusage"))
-        XCTAssertFalse(CommandLineToolInstaller.isOpenUsageHelper("/Applications/Usage.app/Contents/Helpers/openusage"))
+        XCTAssertTrue(CommandLineToolInstaller.isOpenUsageHelper("/Applications/Brim.app/Contents/Helpers/brim"))
+        XCTAssertTrue(CommandLineToolInstaller.isOpenUsageHelper("/Users/me/Dev/openusage/dist/Brim.app/Contents/Helpers/brim"))
+        XCTAssertTrue(CommandLineToolInstaller.isOpenUsageHelper("/Applications/Brim Beta.app/Contents/Helpers/brim"))
+        XCTAssertFalse(CommandLineToolInstaller.isOpenUsageHelper("/Applications/Brim.app/Contents/MacOS/openusage"))
+        XCTAssertFalse(CommandLineToolInstaller.isOpenUsageHelper("/Applications/Usage.app/Contents/Helpers/brim"))
         XCTAssertFalse(CommandLineToolInstaller.isOpenUsageHelper("/opt/homebrew/bin/openusage"))
-        XCTAssertFalse(CommandLineToolInstaller.isOpenUsageHelper("Contents/Helpers/openusage"))
+        XCTAssertFalse(CommandLineToolInstaller.isOpenUsageHelper("Contents/Helpers/brim"))
     }
 
     func testForeignPathIsNeverOverwritten() throws {
@@ -164,8 +164,8 @@ final class CommandLineToolInstallerTests: XCTestCase {
     func testTheScriptLinksRefusesAnExistingPathOrAChangedLinkAndNeverWritesThroughAPlantedLink() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("open usage's \(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: root) }
-        let source = root.appendingPathComponent("OpenUsage.app/Contents/Helpers/openusage").path
-        let other = root.appendingPathComponent("Other OpenUsage.app/Contents/Helpers/openusage").path
+        let source = root.appendingPathComponent("Brim.app/Contents/Helpers/brim").path
+        let other = root.appendingPathComponent("Other Brim.app/Contents/Helpers/brim").path
         let destination = root.appendingPathComponent("bin/openusage").path
         try FileManager.default.createDirectory(atPath: (source as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
         try Data().write(to: URL(fileURLWithPath: source))

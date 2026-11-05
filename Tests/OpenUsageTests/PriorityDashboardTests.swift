@@ -45,7 +45,6 @@ final class PriorityDashboardTests: QuietWindowTestCase {
             .environment(container.popover)
             .environment(container.dataStore)
             .environment(container.renaming)
-            .environment(UpdaterController())
             .environment(\.colorScheme, .light)
         let (window, host) = show(view, in: .titled, size: CGSize(width: PanelMetrics.width, height: 300))
         return Hosted(window: window, host: host, defaults: defaults, popover: container.popover, frames: frames, accounts: accounts)
@@ -86,7 +85,6 @@ final class PriorityDashboardTests: QuietWindowTestCase {
             let view = DashboardContentView(reorderSpaceName: "reorder", reorderLift: .constant(nil), scrollPosition: .constant(ScrollPosition(edge: .top)))
                 .environment(LayoutStore(registry: registry, defaults: defaults))
                 .environment(popover)
-                .environment(UpdaterController())
             let (window, host) = show(view, in: .titled, size: CGSize(width: PanelMetrics.width, height: 300))
             if #available(macOS 26, *) {
                 // The call to action is the last control, just above the empty view's bottom padding.

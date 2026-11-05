@@ -32,7 +32,7 @@ final class DisplaySettingsTests: QuietWindowTestCase {
                        ["Priority", container.dataStore.menuBarLimit.label, "30% left", "10% left",
                         "Appearance", AppearanceSetting.system.label],
                        "one Priority heading over the menu bar picker, Warning, and Critical, then Appearance and its Theme picker")
-        XCTAssertFalse(texts(in: host).contains { $0.hasPrefix("OpenUsage intelligently displays") }, "no note under Priority")
+        XCTAssertFalse(texts(in: host).contains { $0.hasPrefix("Brim intelligently displays") }, "no note under Priority")
     }
 
     func testEachDisplayRowExplainsItselfInAnInfoTooltipInsteadOfASecondLine() async throws {
@@ -74,7 +74,6 @@ final class DisplaySettingsTests: QuietWindowTestCase {
             .environment(container.layout)
             .environment(container.popover)
             .environment(container.dataStore)
-            .environment(UpdaterController())
         let (window, host) = show(settings, size: CGSize(width: PanelMetrics.width, height: 900))
         return (container, window, host)
     }

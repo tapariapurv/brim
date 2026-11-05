@@ -32,7 +32,7 @@ enum CredentialVaultError: LocalizedError {
 }
 
 struct KeychainCredentialVault: CredentialVault {
-    static let service = "com.robinebers.openusage.accounts"
+    static let service = "com.tapariapurv.brim.accounts"
     private let items = KeychainItems(service: service)
 
     func load(_ id: UUID) throws -> AccountCredential? {
@@ -113,7 +113,7 @@ enum KeychainVaultError: LocalizedError {
         switch self {
         case .status(let status):
             let reason = SecCopyErrorMessageString(status, nil) as String? ?? "error \(status)"
-            return "OpenUsage couldn't use its Keychain item for this account (\(reason))."
+            return "Brim couldn't use its Keychain item for this account (\(reason))."
         }
     }
 }

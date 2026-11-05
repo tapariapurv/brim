@@ -57,6 +57,6 @@ final class AccountRemovalTests: XCTestCase {
 
         XCTAssertEqual(accounts.accounts.map(\.id), [account.id])
         let keychainReason = try XCTUnwrap(SecCopyErrorMessageString(errSecInteractionNotAllowed, nil) as String?)
-        XCTAssertEqual(accounts.lastError, "OpenUsage couldn't use its Keychain item for this account (\(keychainReason)).")
+        XCTAssertEqual(accounts.lastError, "Brim couldn't use its Keychain item for this account (\(keychainReason)).")
     }
 }

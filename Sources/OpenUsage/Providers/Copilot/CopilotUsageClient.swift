@@ -32,7 +32,7 @@ struct CopilotUsageClient: Sendable {
     func organizationUsage(_ organization: String, token: String) async throws -> [MetricLine] {
         let response = try await LoginHTTP.get(Self.organizationUsageURL(organization), bearerToken: token, using: http, headers: [
             "Accept": "application/vnd.github+json",
-            "User-Agent": "OpenUsage",
+            "User-Agent": "Brim",
             "X-GitHub-Api-Version": "2022-11-28"
         ])
         if ProviderError.isAuthFailure(response) { throw ProviderError.keyRejected("GitHub rejected the token.") }

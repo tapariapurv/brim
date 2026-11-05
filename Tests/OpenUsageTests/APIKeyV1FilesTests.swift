@@ -15,8 +15,8 @@ final class APIKeyV1FilesTests: XCTestCase {
         XCTAssertEqual(store.accounts.map(\.kind), [.openrouter, .zai])
         XCTAssertEqual(store.accounts.map(\.label), ["OpenRouter Account", "Z.ai Account"])
         XCTAssertEqual(try store.accounts.map { try vault.load($0.id) }, [.apiKey("sk-or-saved"), .apiKey("zai-saved")])
-        XCTAssertEqual(try String(contentsOf: home.appending(path: ".config/openusage/openrouter.json"), encoding: .utf8), #"{"apiKey":"sk-or-saved"}"#)
-        XCTAssertEqual(try String(contentsOf: home.appending(path: ".config/openusage/zai.json"), encoding: .utf8), #"{"apiKey":"zai-saved"}"#)
+        XCTAssertEqual(try String(contentsOf: home.appending(path: ".config/brim/openrouter.json"), encoding: .utf8), #"{"apiKey":"sk-or-saved"}"#)
+        XCTAssertEqual(try String(contentsOf: home.appending(path: ".config/brim/zai.json"), encoding: .utf8), #"{"apiKey":"zai-saved"}"#)
     }
 
     func testSkipsAProviderThatAlreadyHasAnAccount() async throws {
@@ -74,7 +74,7 @@ final class APIKeyV1FilesTests: XCTestCase {
         XCTAssertEqual(store.accounts.map(\.kind), [.zai], "the enabled provider still imports")
         XCTAssertEqual(try store.accounts.map { try vault.load($0.id) }, [.apiKey("zai-saved")])
         XCTAssertFalse(http.requests.contains { $0.url.host == "openrouter.ai" }, "a provider the user turned off sends no key check")
-        XCTAssertEqual(try String(contentsOf: home.appending(path: ".config/openusage/openrouter.json"), encoding: .utf8), openRouterFile)
+        XCTAssertEqual(try String(contentsOf: home.appending(path: ".config/brim/openrouter.json"), encoding: .utf8), openRouterFile)
     }
 
     func testLeavesAProviderOnAnOlderDisabledListOff() async throws {
@@ -169,7 +169,7 @@ final class APIKeyV1FilesTests: XCTestCase {
         let http = acceptingHTTP()
 
         await APIKeyV1Files.importOnce(
-            into: store, defaults: isolatedDefaults(), home: home, http: http, bundleIdentifier: "com.robinebers.openusage.dev"
+            into: store, defaults: isolatedDefaults(), home: home, http: http, bundleIdentifier: "com.tapariapurv.brim.dev"
         )
 
         XCTAssertTrue(store.accounts.isEmpty)
@@ -178,7 +178,7 @@ final class APIKeyV1FilesTests: XCTestCase {
 
     private func makeHome(openRouter: String? = nil, zai: String? = nil) throws -> URL {
         let home = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
-        let folder = home.appending(path: ".config/openusage")
+        let folder = home.appending(path: ".config/brim")
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         addTeardownBlock { try? FileManager.default.removeItem(at: home) }
         try openRouter?.write(to: folder.appending(path: "openrouter.json"), atomically: true, encoding: .utf8)

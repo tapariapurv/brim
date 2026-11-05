@@ -30,8 +30,8 @@ final class CommandLineToolInstaller {
 
     init(
         sourcePath: String = Bundle.main.bundleURL
-            .appendingPathComponent("Contents/Helpers/openusage").path,
-        destinationPath: String = "/usr/local/bin/openusage",
+            .appendingPathComponent("Contents/Helpers/brim").path,
+        destinationPath: String = "/usr/local/bin/brim",
         fileManager: FileManager = .default,
         performPrivileged: (@MainActor (Operation, String, String) -> OperationResult)? = nil
     ) {
@@ -64,11 +64,11 @@ final class CommandLineToolInstaller {
         refreshStatus()
         guard status != .installed else { return }
         guard status != .conflict else {
-            errorMessage = "\(destinationPath) already exists and wasn't installed by OpenUsage."
+            errorMessage = "\(destinationPath) already exists and wasn't installed by Brim."
             return
         }
         guard fileManager.isExecutableFile(atPath: sourcePath) else {
-            errorMessage = "The bundled terminal helper couldn't be found. Reinstall OpenUsage and try again."
+            errorMessage = "The bundled terminal helper couldn't be found. Reinstall Brim and try again."
             return
         }
         var replacing: String?
@@ -82,12 +82,12 @@ final class CommandLineToolInstaller {
         handle(performPrivileged(.uninstall, sourcePath, destinationPath), action: "remove")
     }
 
-    /// Every OpenUsage installer, main's included, links the command to `<OpenUsage….app>/Contents/Helpers/openusage`.
+    /// Every OpenUsage installer, main's included, links the command to `<OpenUsage….app>/Contents/Helpers/brim`.
     static func isOpenUsageHelper(_ path: String) -> Bool {
         let components = (path as NSString).pathComponents
         guard components.count >= 4, Array(components.suffix(3)) == ["Contents", "Helpers", "openusage"] else { return false }
         let bundle = components[components.count - 4]
-        return bundle.hasPrefix("OpenUsage") && bundle.hasSuffix(".app")
+        return bundle.hasPrefix("Brim") && bundle.hasSuffix(".app")
     }
 
     private func handle(_ result: OperationResult, action: String) {

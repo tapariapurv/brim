@@ -39,7 +39,7 @@ final class TelemetryRecorder {
     private static let providerAccountsDayKey = "providerAccountsDay"
 
     static var suite: UserDefaults {
-        UserDefaults(suiteName: (Bundle.main.bundleIdentifier ?? "com.openusage.app") + ".telemetry") ?? .standard
+        UserDefaults(suiteName: (Bundle.main.bundleIdentifier ?? "com.tapariapurv.brim.app") + ".telemetry") ?? .standard
     }
 
     init(

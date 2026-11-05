@@ -3,7 +3,7 @@ import Network
 
 final class LoopbackCallbackServer: @unchecked Sendable {
     private let listener: NWListener
-    private let queue = DispatchQueue(label: "com.robinebers.openusage.oauth-callback")
+    private let queue = DispatchQueue(label: "com.tapariapurv.brim.oauth-callback")
     private let state: String
     private let path: String
     private let lock = NSLock()
@@ -44,7 +44,7 @@ final class LoopbackCallbackServer: @unchecked Sendable {
                     break
                 }
             }
-            listener.start(queue: DispatchQueue(label: "com.robinebers.openusage.oauth-listener"))
+            listener.start(queue: DispatchQueue(label: "com.tapariapurv.brim.oauth-listener"))
         }
         return server
     }
@@ -121,7 +121,7 @@ final class LoopbackCallbackServer: @unchecked Sendable {
 
     private func reply(_ connection: NWConnection, status: Int, body: String, result: Result<String, Error>? = nil) {
         if let result { finish(result) }
-        let bodyData = Data("<!doctype html><title>OpenUsage</title><p>\(body)</p>".utf8)
+        let bodyData = Data("<!doctype html><title>Brim</title><p>\(body)</p>".utf8)
         let response = Data(
             "HTTP/1.1 \(status) \(status == 200 ? "OK" : "Error")\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: \(bodyData.count)\r\nConnection: close\r\n\r\n".utf8
         ) + bodyData

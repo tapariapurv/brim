@@ -83,7 +83,6 @@ final class InlineRenameFocusTests: QuietWindowTestCase {
                 .environment(container.popover)
                 .environment(container.dataStore)
                 .environment(container.renaming)
-                .environment(UpdaterController())
                 .environment(\.colorScheme, .light)
         ))
         let frame = NSRect(x: -20_000, y: -20_000, width: PanelMetrics.width, height: 400)

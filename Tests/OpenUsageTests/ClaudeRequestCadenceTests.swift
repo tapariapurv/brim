@@ -144,7 +144,7 @@ final class ClaudeRequestCadenceTests: XCTestCase {
         let retryAt = Self.start.addingTimeInterval(1800)
         XCTAssertEqual(
             relaunched.stalenessHint(for: account.cardID),
-            "Claude asked OpenUsage to wait. Retrying at \(Formatters.compactClock(retryAt, now: clock.now))."
+            "Claude asked Brim to wait. Retrying at \(Formatters.compactClock(retryAt, now: clock.now))."
         )
     }
 

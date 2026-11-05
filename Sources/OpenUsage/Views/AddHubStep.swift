@@ -24,7 +24,7 @@ struct HubConnectStep: View {
                     if let errorMessage = flow.errorMessage {
                         ErrorText(errorMessage)
                     } else {
-                        Text("The hub needs remote management turned on. OpenUsage uses https unless you type http://, which works only for this Mac, your local network, or Tailscale.")
+                        Text("The hub needs remote management turned on. Brim uses https unless you type http://, which works only for this Mac, your local network, or Tailscale.")
                             .foregroundStyle(.secondary)
                     }
                 }

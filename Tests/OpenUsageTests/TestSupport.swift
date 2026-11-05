@@ -268,7 +268,6 @@ extension QuietWindowTestCase {
                 .environment(container.popover)
                 .environment(container.dataStore)
                 .environment(container.renaming)
-                .environment(UpdaterController())
                 .environment(\.colorScheme, .light)
         ))
         let panel = QuietMenuBarPanel(contentRect: NSRect(x: 0, y: 0, width: PanelMetrics.width, height: PanelHeightController.defaultHeight))

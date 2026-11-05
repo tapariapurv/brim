@@ -100,7 +100,7 @@ final class CLIProxyHubNestingTests: QuietWindowTestCase {
 
         container.popover.customizeHubID = mini.id
         let hubPage = try await screenText(container)
-        for text in ["mini0@example.com", "mini1@example.com", "1 login OpenUsage doesn", "Replace Management Key", "Remove Hub"] {
+        for text in ["mini0@example.com", "mini1@example.com", "1 login Brim doesn", "Replace Management Key", "Remove Hub"] {
             XCTAssertTrue(ocrShows(in: hubPage, text), "the hub's page lacks \(text): \(hubPage)")
         }
         XCTAssertFalse(ocrShows(in: hubPage, "Personal"), hubPage)
@@ -129,7 +129,6 @@ final class CLIProxyHubNestingTests: QuietWindowTestCase {
             .environment(container.popover)
             .environment(container.dataStore)
             .environment(container.renaming)
-            .environment(UpdaterController())
             .environment(\.colorScheme, .light)
         let (window, host) = show(view, in: .borderless, size: CGSize(width: PanelMetrics.width, height: 640))
         defer { window.close() }

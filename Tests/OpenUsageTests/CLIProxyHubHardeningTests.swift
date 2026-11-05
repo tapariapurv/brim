@@ -47,7 +47,7 @@ final class CLIProxyHubHardeningTests: XCTestCase {
         } catch {
             XCTAssertEqual(
                 error.localizedDescription,
-                "Use https for hub.example.com:8317. OpenUsage uses http only for a hub on this Mac, your local network, or Tailscale."
+                "Use https for hub.example.com:8317. Brim uses http only for a hub on this Mac, your local network, or Tailscale."
             )
         }
         XCTAssertTrue(http.requests.isEmpty)
@@ -140,7 +140,7 @@ final class CLIProxyHubHardeningTests: XCTestCase {
         let hub = try XCTUnwrap(store.hubs.first)
         XCTAssertTrue(store.accounts.isEmpty)
         XCTAssertEqual(
-            sync.status(of: hub.id), .failed("OpenUsage couldn’t save this hub’s logins in the Keychain. It tries again when Accounts opens.")
+            sync.status(of: hub.id), .failed("Brim couldn’t save this hub’s logins in the Keychain. It tries again when Accounts opens.")
         )
 
         vault.saveError.value = nil

@@ -19,7 +19,6 @@ final class PopoverFooterTests: QuietWindowTestCase {
             .environment(container.layout)
             .environment(container.popover)
             .environment(container.dataStore)
-            .environment(UpdaterController())
         let (window, host) = show(footer)
         defer { window.close() }
         func labelled(in element: Any) -> [(text: String, frame: NSRect)] {
@@ -29,7 +28,7 @@ final class PopoverFooterTests: QuietWindowTestCase {
             let own = text.flatMap { text in frame.map { (text, $0) } }.map { [$0] } ?? []
             return own + (node.value(forKey: "accessibilityChildren") as? [Any] ?? []).flatMap(labelled)
         }
-        let versionText = "OpenUsage \(AppInfo.version)"
+        let versionText = "Brim \(AppInfo.version)"
         func frame(_ match: (String) -> Bool) -> NSRect? { labelled(in: host).first { match($0.text) }?.frame }
         try await waitUntil { frame { $0 == versionText } != nil && frame { $0.hasPrefix("Next update in") } != nil }
         let version = try XCTUnwrap(frame { $0 == versionText })

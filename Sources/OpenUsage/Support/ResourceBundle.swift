@@ -13,7 +13,7 @@ extension Bundle {
     /// This accessor looks where the resource bundle actually ships first, and only falls back to
     /// `Bundle.module` for `swift run` / `swift test`, where the build path is valid.
     static let openUsageResources: Bundle = {
-        let bundleName = "OpenUsage_OpenUsage.bundle"
+        let bundleName = "Brim_OpenUsage.bundle"
         let containingAppResources = Bundle.main.executableURL
             .flatMap(ContainingAppBundle.url(for:))?
             .appendingPathComponent("Contents/Resources", isDirectory: true)

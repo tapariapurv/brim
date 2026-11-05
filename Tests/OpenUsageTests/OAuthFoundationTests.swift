@@ -147,7 +147,7 @@ private final class CallbackClient: @unchecked Sendable {
                 default: break
                 }
             }
-            connection.start(queue: DispatchQueue(label: "com.robinebers.openusage.tests.callback-client"))
+            connection.start(queue: DispatchQueue(label: "com.tapariapurv.brim.tests.callback-client"))
         }
     }
 

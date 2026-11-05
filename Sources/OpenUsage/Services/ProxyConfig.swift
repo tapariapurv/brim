@@ -30,9 +30,9 @@ struct ProxyConfig: Equatable, Sendable {
         var errorDescription: String? {
             switch self {
             case .invalidJSON:
-                #"~/.openusage/config.json is not valid JSON in the form {"proxy": {"enabled": true, "url": "socks5://host:port"}}"#
+                #"~/.brim/config.json is not valid JSON in the form {"proxy": {"enabled": true, "url": "socks5://host:port"}}"#
             case .invalidURL:
-                "proxy.url in ~/.openusage/config.json must be socks5://, http://, or https://, then a host and an optional port"
+                "proxy.url in ~/.brim/config.json must be socks5://, http://, or https://, then a host and an optional port"
             }
         }
     }
@@ -44,7 +44,7 @@ struct ProxyConfig: Equatable, Sendable {
 
     static func load() -> ProxyConfig? {
         do {
-            let proxy = try parse(Data(contentsOf: URL.homeDirectory.appending(path: ".openusage/config.json")))
+            let proxy = try parse(Data(contentsOf: URL.homeDirectory.appending(path: ".brim/config.json")))
             if let proxy {
                 AppLog.notice(.config, "proxy on: \(proxy.scheme.rawValue)://\(proxy.host):\(proxy.port)")
             }

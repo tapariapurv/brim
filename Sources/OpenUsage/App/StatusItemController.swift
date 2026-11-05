@@ -92,7 +92,6 @@ class MenuBarPanel: NSPanel {
 @MainActor
 final class StatusItemController: NSObject {
     private let container: AppContainer
-    private let updater: UpdaterController
     private let statusItem: NSStatusItem
     private var stripGate = StripGate()
     private var rankingTick: Task<Void, Never>?
@@ -107,9 +106,8 @@ final class StatusItemController: NSObject {
     )
     private let host: NSHostingView<AnyView>
 
-    init(container: AppContainer, updater: UpdaterController) {
+    init(container: AppContainer) {
         self.container = container
-        self.updater = updater
         let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.statusItem = statusItem
 
@@ -122,7 +120,6 @@ final class StatusItemController: NSObject {
                     .environment(container.dataStore)
                     .environment(container.renaming)
                     .environment(container.popover)
-                    .environment(updater)
             )
         )
         self.host = host
@@ -206,7 +203,7 @@ final class StatusItemController: NSObject {
         let (accounts, burningFast, limit, updateAvailable) = withObservationTracking {
             let limit = container.hideFromScreenShare.isConcealing ? .iconOnly : container.dataStore.menuBarLimit
             let accounts = limit == .iconOnly ? [] : container.dataStore.accounts(in: container.layout.displayGroups)
-            return (accounts, container.dataStore.burningFast, limit, updater.availableUpdateVersion != nil)
+            return (accounts, container.dataStore.burningFast, limit, false)
         } onChange: { [weak self] in
             Task { @MainActor [weak self] in
                 try? await Task.sleep(for: .milliseconds(50))
@@ -259,7 +256,7 @@ final class StatusItemController: NSObject {
             self?.openSettings()
         })
         menu.addItem(.separator())
-        menu.addItem(ClosureMenuItem(title: "Quit OpenUsage", systemSymbol: "power", keyEquivalent: "q") {
+        menu.addItem(ClosureMenuItem(title: "Quit Brim", systemSymbol: "power", keyEquivalent: "q") {
             NSApplication.shared.terminate(nil)
         })
 

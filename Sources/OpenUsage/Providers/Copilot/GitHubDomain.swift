@@ -7,7 +7,7 @@ enum GitHubDomain: Hashable, Sendable {
     /// A `<name>.ghe.com` domain.
     case enterprise(String)
 
-    static let invalidMessage = "OpenUsage works with GitHub Enterprise on GHE.com. Enter an address like octocorp.ghe.com."
+    static let invalidMessage = "Brim works with GitHub Enterprise on GHE.com. Enter an address like octocorp.ghe.com."
 
     init(saved domain: String?) {
         self = domain.map(Self.enterprise) ?? .github

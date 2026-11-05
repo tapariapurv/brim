@@ -9,7 +9,7 @@ struct CLIProxyHub: Codable, Identifiable, Hashable, Sendable {
     /// The hub's off switch: while false, Add Account offers no hub, and a stored hub or an account's hub
     /// link reads no key and sends nothing.
     static let isEnabled = true
-    static let offMessage = "CLIProxyAPI hubs are turned off in this version of OpenUsage."
+    static let offMessage = "CLIProxyAPI hubs are turned off in this version of Brim."
 
     let id: UUID
     let url: URL

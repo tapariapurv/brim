@@ -8,24 +8,12 @@ struct DashboardContentView: View {
     @Binding var reorderLift: ReorderLift?
     @Binding var scrollPosition: ScrollPosition
 
-    @Environment(UpdaterController.self) private var updater
-
     /// Half the space on each side of the content: it and the bar beside it each hold this much.
     static let barGap: CGFloat = 7
 
     var body: some View {
         PopoverScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                // A pending update found by a scheduled Sparkle check tops everything: it's the reminder
-                // the buried Sparkle window can't deliver for a dockless app.
-                if let updateVersion = updater.availableUpdateVersion {
-                    UpdateBannerCard(version: updateVersion)
-                        .padding(.bottom, PanelMetrics.sectionSpacing)
-                        .transition(.scale(scale: 0.95).combined(with: .opacity))
-                }
-                widgetContent
-            }
-            .animation(Motion.spring, value: updater.availableUpdateVersion)
+            widgetContent
             .padding(.horizontal, PanelMetrics.margin)
             .padding(.vertical, Self.barGap)
             .frame(maxWidth: .infinity, alignment: .leading)
