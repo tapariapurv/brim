@@ -132,7 +132,9 @@ final class AccountProviderRuntime: ProviderRuntime {
             return .success(try await readSnapshot(using: loadCredential()))
         } catch {
             // The signed-in read is better, but the logs beat nothing. Say so rather than hide the failure.
-            if var usage = await localProviderUsage(), !usage.lines.isEmpty {
+            if var usage = await localProviderUsage(), let lines = fallbackLines(over: usage.lines), !lines.isEmpty {
+                usage.lines = lines
+                if account.kind == .claude { usage.plan = claude.session?.planRead.value ?? claude.restoredPlan }
                 AppLog.warn(LogTag.plugin(account.kind.rawValue), "using local logs: \(error.localizedDescription)")
                 usage.notice = "Showing local logs. \(error.localizedDescription)"
                 return .success(snapshot(of: usage))
@@ -453,6 +455,14 @@ final class AccountProviderRuntime: ProviderRuntime {
         return snapshot(of: usage)
     }
 
+    /// Claude's logs have no limits without the feed, so its last reading carries them through a pause.
+    private func fallbackLines(over local: [MetricLine]) -> [MetricLine]? {
+        guard account.kind == .claude else { return local }
+        var lines = ClaudeFeed.merge(local, over: claude.lastLines)
+        if let session = claude.session, let resets = claudeResetsLine(session) { lines.append(resets) }
+        return lines
+    }
+
     func localProviderUsage() async -> ProviderUsage? {
         guard let localUsage, LocalUsageReader.kinds.contains(account.kind) else { return nil }
         let lines = await localUsage.limitLines(account.kind, now: now())
@@ -468,14 +478,8 @@ final class AccountProviderRuntime: ProviderRuntime {
         else { return history }
         let calendar = history?.calendar ?? .current
         let asOf = history?.asOf ?? now()
-        var merged = history ?? UsageHistory(calendar: calendar, asOf: asOf)
-        for (start, day) in await localUsage.days(account.kind, count: count, now: asOf, calendar: calendar) {
-            var kept = merged.days[start] ?? day
-            kept.totals.values[.estimatedSpend] = day.totals[.estimatedSpend]
-            if kept.totals[.tokens] == nil { kept.totals.values[.tokens] = day.totals[.tokens] }
-            merged.days[start] = kept
-        }
-        return merged
+        let local = await localUsage.days(account.kind, count: count, now: asOf, calendar: calendar)
+        return LocalUsageReader.merge(local, into: history ?? UsageHistory(calendar: calendar, asOf: asOf))
     }
 
     private func snapshot(of usage: ProviderUsage) -> ProviderSnapshot {

@@ -25,7 +25,6 @@ struct LevelIndicator: View {
                         let color = Theme.severityColor(severity)
                         Capsule()
                             .fill(LinearGradient(colors: [color.opacity(0.82), color], startPoint: .leading, endPoint: .trailing))
-                            .overlay(alignment: .top) { Capsule().fill(.white.opacity(0.18)).frame(height: 2).padding(.horizontal, 2).padding(.top, 1) }
                             .frame(width: max(Self.height, (proxy.size.width * clamped).rounded()))
                     }
                 }

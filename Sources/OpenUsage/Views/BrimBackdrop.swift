@@ -53,8 +53,8 @@ private struct LiquidFill: View {
     var body: some View {
         let color = Color.teal.mix(with: .orange, by: max(0, level - 0.35) / 0.65)
         ZStack {
-            Wave(level: level, phase: time * 0.5, amplitude: 9).fill(color.opacity(0.14))
-            Wave(level: level, phase: -time * 0.35 + 2, amplitude: 6).fill(color.opacity(0.22))
+            Wave(level: level, phase: time * 0.5, amplitude: 9).fill(color.opacity(0.07))
+            Wave(level: level, phase: -time * 0.35 + 2, amplitude: 6).fill(color.opacity(0.11))
         }
         .animation(.smooth(duration: 0.8), value: level)
     }

@@ -65,17 +65,19 @@ extension AccountProviderRuntime {
         return now().timeIntervalSince(last) >= ClaudeSession.feedTopUpInterval
     }
 
-    var hasLiveLocalData: Bool { claude.session != nil && claudeFeedLines() != nil }
+    /// A Claude pause doesn't stop the logs: the refresh still runs, and sends nothing inside the window.
+    var hasLiveLocalData: Bool { account.kind == .claude && (localUsage != nil || (claude.session != nil && claudeFeedLines() != nil)) }
 
     var rereadsHourlyOnManualRefresh: Bool { account.kind != .claude }
 
     func holdsRead(forced: Bool) -> Bool {
-        guard account.kind == .claude, !hasLiveLocalData, let session = claude.session else { return false }
+        guard account.kind == .claude, claudeFeedLines() == nil, let session = claude.session else { return false }
         return session.readIsHeld(forced: forced, at: now())
     }
 
     func restoreClaude(_ snapshot: ProviderSnapshot) {
-        claude.lastLines = snapshot.lines.filter { $0.label != ClaudeResetGrantStatus.lineLabel }
+        let historyTitles = Set(widgetDescriptors.compactMap { $0.historyRow?.title })
+        claude.lastLines = snapshot.lines.filter { $0.label != ClaudeResetGrantStatus.lineLabel && !historyTitles.contains($0.label) }
         claude.restoredPlan = snapshot.plan
         claude.restoredResets = snapshot.line(label: ClaudeResetGrantStatus.lineLabel)
     }
@@ -133,7 +135,7 @@ extension AccountProviderRuntime {
         return session
     }
 
-    private func claudeResetsLine(_ session: ClaudeSession) -> MetricLine? {
+    func claudeResetsLine(_ session: ClaudeSession) -> MetricLine? {
         guard let check = session.resetGrants.check else { return claude.restoredResets }
         return check.status?.line(now: now())
     }

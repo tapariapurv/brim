@@ -35,6 +35,19 @@ final class LocalUsageTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(totals?[.estimatedSpend]), 11, accuracy: 0.001)
     }
 
+    func testEstimatesStayOutWhenTheLogsCoverOnlyPartOfTheReportedTokens() {
+        let start = utc.startOfDay(for: now)
+        func day(_ tokens: Double, spend: Double? = nil) -> [Date: UsageDay] {
+            var totals = UsageTotals(values: [.tokens: tokens])
+            totals.values[.estimatedSpend] = spend
+            return [start: UsageDay(totals: totals)]
+        }
+        let reported = UsageHistory(calendar: utc, asOf: now, days: day(1000))
+        XCTAssertNil(LocalUsageReader.merge(day(100, spend: 1), into: reported).days[start]?.totals[.estimatedSpend])
+        XCTAssertEqual(LocalUsageReader.merge(day(950, spend: 1), into: reported).days[start]?.totals[.estimatedSpend], 1)
+        XCTAssertEqual(LocalUsageReader.merge(day(5, spend: 1), into: UsageHistory(calendar: utc, asOf: now)).days[start]?.totals[.tokens], 5)
+    }
+
     func testOnlyProvidersWithLogsAndNoSignInGetALocalCard() throws {
         let home = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
         try FileManager.default.createDirectory(at: home.appending(path: ".codex/sessions"), withIntermediateDirectories: true)

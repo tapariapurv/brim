@@ -145,6 +145,23 @@ actor LocalUsageReader {
         return days
     }
 
+    /// Adds the logs' estimates to what the provider reported. If the provider counts far more tokens than
+    /// this Mac logged, as when the account is used elsewhere, a price would look like the cost of all of
+    /// them, so it leaves the estimates out.
+    static func merge(_ local: [Date: UsageDay], into history: UsageHistory) -> UsageHistory {
+        let reported = history.days.values.reduce(0) { $0 + ($1.totals[.tokens] ?? 0) }
+        let logged = local.values.reduce(0) { $0 + ($1.totals[.tokens] ?? 0) }
+        guard logged >= reported * 0.9 else { return history }
+        var merged = history
+        for (start, day) in local {
+            var kept = merged.days[start] ?? day
+            kept.totals.values[.estimatedSpend] = day.totals[.estimatedSpend]
+            if kept.totals[.tokens] == nil { kept.totals.values[.tokens] = day.totals[.tokens] }
+            merged.days[start] = kept
+        }
+        return merged
+    }
+
     static func price(for model: String, in prices: [String: Price]) -> Price? {
         if let price = prices[model] { return price }
         // "claude-haiku-4-5-20251001" is listed without its date.
