@@ -26,6 +26,7 @@ final class UnreportedRowsTests: XCTestCase {
             }
         }
         XCTAssertEqual(shown, [
+            "claude.today": "0 tokens", "claude.yesterday": "0 tokens", "claude.last30": "0 tokens",
             "codex.today": "0 tokens", "codex.yesterday": "0 tokens", "codex.last30": "0 tokens",
             "cursor.today": "$0 · 0 tokens", "cursor.yesterday": "$0 · 0 tokens", "cursor.last30": "$0 · 0 tokens",
             "ollama.today": "$0 · 0 tokens", "ollama.yesterday": "$0 · 0 tokens", "ollama.last30": "$0 · 0 tokens",

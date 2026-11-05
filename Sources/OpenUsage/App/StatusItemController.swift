@@ -200,10 +200,12 @@ final class StatusItemController: NSObject {
     }
 
     private func updateImage() {
-        let (accounts, burningFast, limit, updateAvailable) = withObservationTracking {
-            let limit = container.hideFromScreenShare.isConcealing ? .iconOnly : container.dataStore.menuBarLimit
-            let accounts = limit == .iconOnly ? [] : container.dataStore.accounts(in: container.layout.displayGroups)
-            return (accounts, container.dataStore.burningFast, limit, false)
+        let (accounts, burningFast, limit, chosen) = withObservationTracking {
+            let concealing = container.hideFromScreenShare.isConcealing
+            let limit = concealing ? .iconOnly : container.dataStore.menuBarLimit
+            let chosen = concealing ? [] : container.dataStore.menuBarMetricIDs
+            let accounts = limit == .iconOnly && chosen.isEmpty ? [] : container.dataStore.accounts(in: container.layout.displayGroups)
+            return (accounts, container.dataStore.burningFast, limit, chosen)
         } onChange: { [weak self] in
             Task { @MainActor [weak self] in
                 try? await Task.sleep(for: .milliseconds(50))
@@ -211,14 +213,15 @@ final class StatusItemController: NSObject {
             }
         }
         rankingTick?.cancel()
-        showStrip(accounts: accounts, burningFast: burningFast, limit: limit, updateAvailable: updateAvailable)
+        showStrip(accounts: accounts, burningFast: burningFast, limit: limit, chosen: chosen)
     }
 
-    private func showStrip(accounts: [DashboardAccount], burningFast: BurningFast?, limit: MenuBarLimit, updateAvailable: Bool) {
+    private func showStrip(accounts: [DashboardAccount], burningFast: BurningFast?, limit: MenuBarLimit, chosen: [String]) {
         let now = Date()
         let board = PriorityBoard.make(accounts: accounts, burningFast: burningFast, now: now)
-        var content = MenuBarContentBuilder.build(board: board, limit: limit)
-        content.updateAvailable = updateAvailable
+        // A chosen metric can have no reading yet, or belong to a removed account: don't go blank over it.
+        let picked = MenuBarContentBuilder.build(accounts: accounts, chosen: chosen)
+        let content = picked.isEmpty ? MenuBarContentBuilder.build(board: board, limit: limit) : picked
         stripGate.show(content) { content in
             statusItem.button?.image = MenuBarStripRenderer.image(for: content)
                 ?? MenuBarStripRenderer.appIcon
@@ -229,7 +232,7 @@ final class StatusItemController: NSObject {
         rankingTick = Task { [weak self] in
             try? await Task.sleep(for: .seconds(30), tolerance: .seconds(1))
             guard !Task.isCancelled else { return }
-            self?.showStrip(accounts: accounts, burningFast: burningFast, limit: limit, updateAvailable: updateAvailable)
+            self?.showStrip(accounts: accounts, burningFast: burningFast, limit: limit, chosen: chosen)
         }
     }
 

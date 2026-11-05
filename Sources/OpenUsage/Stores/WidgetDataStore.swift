@@ -14,6 +14,7 @@ final class WidgetDataStore {
     private static let meterStyleKey = "meterStyle"
     private static let resetDisplayModeKey = "resetDisplayMode"
     private static let menuBarLimitKey = "menuBarLimit"
+    private static let menuBarMetricsKey = "menuBarMetricIDs"
     private static let priorityWarningKey = "priorityWarning"
     private static let priorityCriticalKey = "priorityCritical"
     private static let priorityBurningFastKey = "priorityBurningFast"
@@ -37,6 +38,16 @@ final class WidgetDataStore {
 
     var resetDisplayMode: ResetDisplayMode {
         didSet { defaults.set(resetDisplayMode.rawValue, forKey: Self.resetDisplayModeKey) }
+    }
+
+    /// Metrics the user put in the menu bar, in the order added. Empty means the limits closest to running out.
+    var menuBarMetricIDs: [String] {
+        didSet { defaults.set(menuBarMetricIDs, forKey: Self.menuBarMetricsKey) }
+    }
+
+    func setMetric(_ id: String, inMenuBar: Bool) {
+        menuBarMetricIDs.removeAll { $0 == id }
+        if inMenuBar { menuBarMetricIDs.append(id) }
     }
 
     var menuBarLimit: MenuBarLimit {
@@ -90,6 +101,7 @@ final class WidgetDataStore {
         self.providerRefreshTimeout = providerRefreshTimeout
         self.meterStyle = defaults.enumValue(forKey: Self.meterStyleKey, default: .remaining)
         self.resetDisplayMode = defaults.enumValue(forKey: Self.resetDisplayModeKey, default: .relative)
+        self.menuBarMetricIDs = defaults.stringArray(forKey: Self.menuBarMetricsKey) ?? []
         self.menuBarLimit = defaults.enumValue(forKey: Self.menuBarLimitKey, default: .upToThree)
         self.priorityLimits = PriorityLimits(
             warning: defaults.object(forKey: Self.priorityWarningKey) as? Int ?? PriorityLimits.standard.warning,

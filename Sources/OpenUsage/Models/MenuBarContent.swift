@@ -42,6 +42,16 @@ enum MenuBarContentBuilder {
         return MenuBarContent(items: shown, overflow: board.attention.count - shown.count)
     }
 
+    /// The user's own choice of metrics, shown whatever their level. Ones with no reading are left out.
+    static func build(accounts: [DashboardAccount], chosen ids: [String]) -> MenuBarContent {
+        let lines = accounts.flatMap { account in account.lines.map { (account.provider, $0) } }
+        return MenuBarContent(items: ids.compactMap { id in
+            guard let (provider, line) = lines.first(where: { $0.1.id == id }), line.isVisible else { return nil }
+            let label = line.data.title
+            return MenuBarContent.Item(id: id, provider: provider, label: label, shortLabel: shortLabel(label), value: line.data.menuBarValue)
+        })
+    }
+
     static func shortLabel(_ label: String) -> String {
         var words = label.split(separator: " ")
         guard words.count > 1, let last = words.last, genericWords.contains(last.lowercased()) else { return label }

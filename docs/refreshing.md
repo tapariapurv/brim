@@ -73,3 +73,12 @@ pass. Once the token expires, the refresh fails like any [failed fetch](#when-a-
 ## Brim
 
 The interval is yours to set in Settings > General. Claude reads are spaced and capped, and can come from the Claude Code Live Feed instead. See the [README](../README.md#claude-refreshes).
+
+## Local logs
+
+Claude Code's `~/.claude/projects` and Codex's `~/.codex/sessions` give Brim tokens by model, and Codex's also give its limits. Claude's limits need the Live Feed.
+
+- A provider with no signed-in account gets a card labelled Local. The first read of a large log folder can take a while; later reads only open changed files.
+- When a signed-in read fails, Brim shows the logs' limits and says so on the account.
+- Costs marked `est.` are tokens at LiteLLM's public API rates, refreshed daily to `~/.brim/model-prices.json`. A model it doesn't list counts toward tokens only.
+- Turn this off with **Use Local Claude And Codex Logs** in Settings → General.

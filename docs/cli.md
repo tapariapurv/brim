@@ -95,7 +95,7 @@ account's right-click menu.
 | Provider | Resource keys |
 | --- | --- |
 | Claude | `session`, `weekly`, `sonnet`, `fable`, `extraUsage`, `rateLimitResets` |
-| ChatGPT (`codex`) | `session`, `weekly`, `spark`, `sparkWeekly`, `credits`, `rateLimitResets` |
+| ChatGPT (`codex`) | `session`, `weekly`, `monthly`, `spark`, `sparkWeekly`, `credits`, `rateLimitResets` |
 | Cursor | `totalUsage`, `grokBot`, `autoUsage`, `apiUsage`, `onDemand`, `requests`, `credits` |
 | Antigravity | `geminiSession`, `geminiWeekly`, `argonWeekly`, `nonGeminiSession`, `nonGeminiWeekly` |
 | Copilot | `premiumCredits`, `extraUsage`, `chat`, `completions`; an organization account: `orgCredits`, `orgSpend` |

@@ -60,7 +60,8 @@ extension WidgetDescriptor {
         var descriptor = values(key: key, provider: provider, title: row.title)
         descriptor.historyRow = row
         if case .window(_, let first, let then) = row {
-            descriptor.unreportedValues = [first, then].compactMap(\.self).map { $0.metricValue(0) }
+            // A day with no estimate shows its tokens, not a made-up $0.
+            descriptor.unreportedValues = [first, then].compactMap(\.self).filter { $0 != .estimatedSpend }.map { $0.metricValue(0) }
         }
         return descriptor
     }

@@ -1,6 +1,8 @@
 # Menu bar
 
-The strip shows the limits closest to running out. You only choose how many.
+The strip shows the metrics you choose or, with none chosen, the limits closest to running out.
+
+- Choose metrics in **Settings → General → Menu Bar Items**, or right-click a metric on All Usage and pick **Show In Menu Bar**. They show in the order you added them, whatever their level.
 
 - Left-click the icon to open the panel. Right-click (or control-click) it for **Settings** and
   **Quit Brim**.
@@ -11,8 +13,6 @@ The strip shows the limits closest to running out. You only choose how many.
 - With nothing running out, or with **App Icon Only**, the strip shows the app icon.
 - With [Hide From Screen Share](privacy.md#screen-sharing) on, it shows the app icon while your screen
   is shared or recorded.
-- When an update is available, the app icon shows at the end of the strip until the
-  update banner goes away.
 - When a provider has more than one account, its mark carries the account name's initials: "Personal"
   reads P and "Attention Machine 1" reads A1. Rename one of two accounts with the same initials to tell
   them apart.

@@ -94,7 +94,10 @@ struct WidgetGroupedListView: View {
             .contentShape(Rectangle())
             .contextMenu {
                 DashboardMenu(
-                    sections: [[DashboardMenus.pin(line.id, pinned: layout.isMetricPinned(line.id))]]
+                    sections: [[
+                        DashboardMenus.pin(line.id, pinned: layout.isMetricPinned(line.id)),
+                        DashboardMenus.menuBar(line.id, shown: dataStore.menuBarMetricIDs.contains(line.id))
+                    ]]
                         + DashboardMenus.account(account, status: status.notice ?? status.staleness),
                     perform: perform
                 )
@@ -119,6 +122,8 @@ struct WidgetGroupedListView: View {
             shareScreenshot(accountIDs)
         case .setPinned(let metricID, let pinned):
             layout.setMetric(metricID, pinned: pinned)
+        case .setInMenuBar(let metricID, let shown):
+            dataStore.setMetric(metricID, inMenuBar: shown)
         }
     }
 

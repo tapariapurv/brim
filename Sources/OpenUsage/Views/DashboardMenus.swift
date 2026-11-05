@@ -8,6 +8,7 @@ enum DashboardCommand: Equatable {
     case editAccount(String)
     case shareScreenshot([String])
     case setPinned(String, Bool)
+    case setInMenuBar(String, Bool)
 }
 
 struct DashboardMenuItem: Equatable {
@@ -36,6 +37,12 @@ enum DashboardMenus {
         pinned
             ? DashboardMenuItem(title: "Unpin", command: .setPinned(metricID, false), systemImage: "pin.slash")
             : DashboardMenuItem(title: "Pin", command: .setPinned(metricID, true), systemImage: "pin")
+    }
+
+    static func menuBar(_ metricID: String, shown: Bool) -> DashboardMenuItem {
+        shown
+            ? DashboardMenuItem(title: "Remove From Menu Bar", command: .setInMenuBar(metricID, false), systemImage: "menubar.rectangle")
+            : DashboardMenuItem(title: "Show In Menu Bar", command: .setInMenuBar(metricID, true), systemImage: "menubar.rectangle")
     }
 
     static func account(_ account: DashboardAccount, status: String?) -> Sections {

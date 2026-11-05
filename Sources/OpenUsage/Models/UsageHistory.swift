@@ -1,11 +1,12 @@
 import Foundation
 
-/// One quantity a provider reports for a span. Never estimated, never priced.
+/// One quantity reported for a span. Only `estimatedSpend` is computed: local token logs at public API rates.
 enum UsageMeasure: String, CaseIterable, Codable, CodingKeyRepresentable, Sendable {
     case spend
     /// Spend on the user's own provider keys; never added to `spend`.
     case byokSpend
     case usageValue
+    case estimatedSpend
     case credits
     case usageEvents
     case requests
@@ -26,6 +27,7 @@ enum UsageMeasure: String, CaseIterable, Codable, CodingKeyRepresentable, Sendab
     func metricValue(_ number: Double) -> MetricValue {
         switch self {
         case .spend, .usageValue: MetricValue(number: number, kind: .dollars)
+        case .estimatedSpend: MetricValue(number: number, kind: .dollars, label: "est.")
         case .byokSpend: MetricValue(number: number, kind: .dollars, label: "BYOK")
         case .credits: MetricValue(number: number, kind: .count, label: "credits")
         case .usageEvents: MetricValue(number: number, kind: .count, label: "events")

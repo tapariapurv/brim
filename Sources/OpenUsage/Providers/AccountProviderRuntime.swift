@@ -15,6 +15,7 @@ final class AccountProviderRuntime: ProviderRuntime {
     let usageLedger = UsageLedger()
     let codexCreditsLedger = UsageLedger()
     var claude: ClaudeAccountState
+    var localUsage: LocalUsageReader?
     var codexMatchedCreditIDs: [String: String] = [:]
     var museLastKnown: [MetricLine] = []
     /// One renewal at a time: a provider that rotates refresh tokens refuses a second renewal sent with
@@ -121,9 +122,21 @@ final class AccountProviderRuntime: ProviderRuntime {
     }
 
     func refresh() async -> Result<ProviderSnapshot, RefreshFailure> {
+        if LocalUsageReader.isLocal(account) {
+            guard let usage = await localProviderUsage() else {
+                return .failure(RefreshFailure(message: "No local \(account.kind.displayName) logs to read yet.", kind: .refused))
+            }
+            return .success(snapshot(of: usage))
+        }
         do {
             return .success(try await readSnapshot(using: loadCredential()))
         } catch {
+            // The signed-in read is better, but the logs beat nothing. Say so rather than hide the failure.
+            if var usage = await localProviderUsage(), !usage.lines.isEmpty {
+                AppLog.warn(LogTag.plugin(account.kind.rawValue), "using local logs: \(error.localizedDescription)")
+                usage.notice = "Showing local logs. \(error.localizedDescription)"
+                return .success(snapshot(of: usage))
+            }
             return .failure(RefreshFailure(error: error))
         }
     }
@@ -435,7 +448,37 @@ final class AccountProviderRuntime: ProviderRuntime {
 
     @discardableResult
     func readSnapshot(using credential: AccountCredential) async throws -> ProviderSnapshot {
-        let usage = try await refresh(credential)
+        var usage = try await refresh(credential)
+        usage.history = await withLocalEstimates(usage.history)
+        return snapshot(of: usage)
+    }
+
+    func localProviderUsage() async -> ProviderUsage? {
+        guard let localUsage, LocalUsageReader.kinds.contains(account.kind) else { return nil }
+        let lines = await localUsage.limitLines(account.kind, now: now())
+        let history = await withLocalEstimates(nil)
+        guard !lines.isEmpty || history?.days.isEmpty == false else { return nil }
+        let notice = lines.isEmpty && account.kind == .claude ? "Turn on Claude Code Live Feed in Settings to see limits." : nil
+        return ProviderUsage(plan: "Local", lines: lines, notice: notice, history: history)
+    }
+
+    private func withLocalEstimates(_ history: UsageHistory?) async -> UsageHistory? {
+        guard let localUsage, LocalUsageReader.kinds.contains(account.kind),
+              let count = HistoryRow.dayCount(for: widgetDescriptors)
+        else { return history }
+        let calendar = history?.calendar ?? .current
+        let asOf = history?.asOf ?? now()
+        var merged = history ?? UsageHistory(calendar: calendar, asOf: asOf)
+        for (start, day) in await localUsage.days(account.kind, count: count, now: asOf, calendar: calendar) {
+            var kept = merged.days[start] ?? day
+            kept.totals.values[.estimatedSpend] = day.totals[.estimatedSpend]
+            if kept.totals[.tokens] == nil { kept.totals.values[.tokens] = day.totals[.tokens] }
+            merged.days[start] = kept
+        }
+        return merged
+    }
+
+    private func snapshot(of usage: ProviderUsage) -> ProviderSnapshot {
         var snapshot = ProviderSnapshot(provider: provider, plan: usage.plan, lines: usage.lines, notice: usage.notice)
         snapshot.lineTitles = usage.lineTitles.isEmpty ? nil : usage.lineTitles
         HistoryRow.append(to: &snapshot, for: widgetDescriptors, in: usage.history)

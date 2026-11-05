@@ -30,7 +30,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         NSApp.disableRelaunchOnLogin()
         AppearanceSetting.applyCurrent()
-        let container = AppContainer(telemetry: NoTelemetrySink(), telemetryDefaults: TelemetryRecorder.suite)
+        let container = AppContainer(telemetry: NoTelemetrySink(), telemetryDefaults: TelemetryRecorder.suite, localUsage: LocalUsageReader())
         self.container = container
         container.startRefreshing()
         Task { await APIKeyV1Files.importOnce(into: container.accounts) }

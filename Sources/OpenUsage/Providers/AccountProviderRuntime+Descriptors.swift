@@ -21,7 +21,10 @@ extension AccountProviderRuntime {
                 .boundedDollars(key: "extra", provider: provider, title: "Extra Usage", metricLabel: "Extra usage spent",
                                 limit: 100, valueWord: "spent")
                     .exportingLimit("extraUsage", unit: "usd", source: .progressOrValue(kind: .dollars)),
-                rateLimitResets(key: "rateLimitResets", provider: provider)
+                rateLimitResets(key: "rateLimitResets", provider: provider),
+                .history(key: "today", provider: provider, .window(.today, .estimatedSpend, then: .tokens)),
+                .history(key: "yesterday", provider: provider, .window(.yesterday, .estimatedSpend, then: .tokens)),
+                .history(key: "last30", provider: provider, .window(.lastDays(30), .estimatedSpend, then: .tokens))
             ]
         case .codex:
             [
@@ -29,6 +32,8 @@ extension AccountProviderRuntime {
                     .exportingLimit("session", unit: "percent"),
                 .percent(key: "weekly", provider: provider, title: "Weekly")
                     .exportingLimit("weekly", unit: "percent"),
+                .percent(key: "monthly", provider: provider, title: "Monthly")
+                    .exportingLimit("monthly", unit: "percent"),
                 .percent(key: "spark", provider: provider, title: "Spark")
                     .exportingLimit("spark", unit: "percent"),
                 .percent(key: "sparkWeekly", provider: provider, title: "Spark Weekly")
@@ -37,9 +42,9 @@ extension AccountProviderRuntime {
                     .exportingLimit("credits", kind: .balance, unit: "credits", source: .value(kind: .count, label: "credits")),
                 .boundedCount(key: "creditLimit", provider: provider, title: "Credit Limit", limit: 0),
                 rateLimitResets(key: "rateLimitResets", provider: provider),
-                .history(key: "today", provider: provider, .window(.today, .tokens)),
-                .history(key: "yesterday", provider: provider, .window(.yesterday, .tokens)),
-                .history(key: "last30", provider: provider, .window(.lastDays(30), .tokens))
+                .history(key: "today", provider: provider, .window(.today, .estimatedSpend, then: .tokens)),
+                .history(key: "yesterday", provider: provider, .window(.yesterday, .estimatedSpend, then: .tokens)),
+                .history(key: "last30", provider: provider, .window(.lastDays(30), .estimatedSpend, then: .tokens))
             ]
         case .cursor:
             [

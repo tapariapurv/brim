@@ -7,17 +7,17 @@ final class LayoutMigrationTests: XCTestCase {
         let app = try MigrationApp(defaults: zeroSevenDefaults())
 
         let claude = app.add(.claude)
-        XCTAssertEqual(app.hidden(claude), ["extra", "sonnet"])
-        XCTAssertEqual(app.order(claude), ["session", "weekly", "sonnet", "extra", "fable", "rateLimitResets"])
+        XCTAssertEqual(app.hidden(claude), ["extra", "last30", "sonnet", "yesterday"])
+        XCTAssertEqual(app.order(claude), ["session", "weekly", "sonnet", "extra", "fable", "rateLimitResets", "today", "yesterday", "last30"])
 
         let codex = app.add(.codex)
         XCTAssertEqual(app.hidden(codex), ["last30", "spark", "sparkWeekly", "today", "yesterday"],
                        "a star 0.7.x showed only in the menu bar shows its metric")
-        XCTAssertEqual(app.order(codex), ["weekly", "session", "credits", "rateLimitResets", "spark", "sparkWeekly",
+        XCTAssertEqual(app.order(codex), ["weekly", "session", "credits", "rateLimitResets", "spark", "sparkWeekly", "monthly",
                                           "creditLimit", "today", "yesterday", "last30"])
 
         let secondClaude = app.add(.claude)
-        XCTAssertEqual(app.order(secondClaude), ["session", "weekly", "sonnet", "fable", "extra", "rateLimitResets"],
+        XCTAssertEqual(app.order(secondClaude), ["session", "weekly", "sonnet", "fable", "extra", "rateLimitResets", "today", "yesterday", "last30"],
                        "a provider's later accounts start in declaration order")
         XCTAssertEqual(app.hidden(secondClaude), [], "a provider's later accounts start with every metric shown")
     }
@@ -100,7 +100,7 @@ final class LayoutMigrationTests: XCTestCase {
 
         app.layout.apply(registry: app.layout.registry)
         app.relaunch()
-        XCTAssertEqual(app.hidden(claude), ["extra", "sonnet"])
+        XCTAssertEqual(app.hidden(claude), ["extra", "last30", "sonnet", "yesterday"])
         XCTAssertEqual(app.order(claude).prefix(3), ["session", "weekly", "sonnet"])
         XCTAssertEqual(defaults.data(forKey: "openusage.layout.v2"), saved, "a second run writes nothing")
 
@@ -108,7 +108,7 @@ final class LayoutMigrationTests: XCTestCase {
         XCTAssertTrue(app.layout.setMetric("\(claude.cardID).sonnet", shown: true))
         app.relaunch()
         XCTAssertEqual(app.order(claude).prefix(3), ["sonnet", "session", "weekly"])
-        XCTAssertEqual(app.hidden(claude), ["extra"])
+        XCTAssertEqual(app.hidden(claude), ["extra", "last30", "yesterday"])
     }
 
     /// Shaped like a real 0.7.16 layout: a second Claude account's `@` id beside bare ids, a star on a

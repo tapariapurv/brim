@@ -66,7 +66,7 @@ final class SignInAgainVisibilityTests: QuietWindowTestCase {
             .environment(container.layout)
             .environment(container.popover)
             .environment(container.dataStore)
-        let (window, host) = show(view, in: .titled, size: CGSize(width: PanelMetrics.width, height: 240))
+        let (window, host) = show(view, in: .titled, size: CGSize(width: PanelMetrics.width, height: 440))
         return Page(test: self, container: container, window: window, host: host, id: id)
     }
 }

@@ -5,6 +5,7 @@ struct SettingsScreen: View {
     @Environment(AppContainer.self) private var container
     @Environment(PopoverState.self) private var popover
     @Environment(WidgetDataStore.self) private var dataStore
+    @Environment(LayoutStore.self) private var layout
     @AppStorage(AppearanceSetting.key) private var appearance = AppearanceSetting.system
     @AppStorage(TimeFormatSetting.key) private var timeFormat = TimeFormatSetting.auto
     @AppStorage(DashboardTab.defaultKey) private var defaultTab = DashboardTab.priority
@@ -14,6 +15,7 @@ struct SettingsScreen: View {
     @AppStorage(PaceMilestone.useItOrLoseIt.settingKey) private var useItOrLoseIt = false
     @AppStorage(LogLevelSetting.key) private var logLevel = LogLevelSetting.info
     @AppStorage(BackdropStyle.key) private var backdrop = BackdropStyle.liquid
+    @AppStorage(LocalUsageReader.enabledKey) private var useLocalUsage = true
     @AppStorage(RefreshSetting.key) private var refreshMinutes = RefreshSetting.defaultMinutes
     @State private var claudeFeed = ClaudeFeedInstaller()
     @State private var launchAtLogin = LaunchAtLoginSetting()
@@ -85,8 +87,25 @@ struct SettingsScreen: View {
             ))
             SettingsNote("Reads Claude limits from Claude Code with no request to Anthropic, so they can't get blocked. Adds a status line to Claude Code. Use it when one Claude login is added here and Claude Code uses it too. Without it, Claude asks Anthropic at most every 5 minutes.")
             if let error = claudeFeed.errorMessage { SettingsNote(error, isWarning: true) }
+            Toggle("Use Local Claude And Codex Logs", isOn: $useLocalUsage)
+            SettingsNote("Shows usage from this Mac's logs for a provider you haven't signed in to, and when a signed-in read fails. Costs marked est. are those logs at public API rates.")
         }
         .onChange(of: refreshMinutes) { container.restartRefreshing() }
+        .onChange(of: useLocalUsage) { container.localUsageSettingChanged() }
+        Section {
+            ForEach(dataStore.accounts(in: layout.displayGroups)) { account in
+                ForEach(account.lines.filter(\.isVisible)) { line in
+                    Toggle("\(account.provider.fullName) · \(line.data.title)", isOn: Binding(
+                        get: { dataStore.menuBarMetricIDs.contains(line.id) },
+                        set: { dataStore.setMetric(line.id, inMenuBar: $0) }
+                    ))
+                }
+            }
+        } header: {
+            Text("Menu Bar Items")
+        } footer: {
+            SettingsNote("With none chosen, the menu bar shows the limits closest to running out.")
+        }
     }
 
     @ViewBuilder

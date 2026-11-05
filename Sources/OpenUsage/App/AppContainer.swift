@@ -13,6 +13,7 @@ final class AppContainer {
     let telemetry: TelemetryRecorder
     let hubs: CLIProxyHubSync
     @ObservationIgnored private var providers: [AccountProviderRuntime]
+    @ObservationIgnored private let localUsage: LocalUsageReader?
     @ObservationIgnored private var refreshTask: Task<Void, Never>?
 
     @ObservationIgnored private let http: any HTTPClient
@@ -26,8 +27,10 @@ final class AppContainer {
         defaults: UserDefaults = .standard,
         http: any HTTPClient = URLSessionHTTPClient(),
         telemetry sink: any TelemetrySink,
-        telemetryDefaults: UserDefaults
+        telemetryDefaults: UserDefaults,
+        localUsage: LocalUsageReader? = nil
     ) {
+        self.localUsage = localUsage
         self.accounts = accounts
         self.http = http
         self.defaults = defaults
@@ -166,15 +169,27 @@ final class AppContainer {
         startRefreshing()
     }
 
+    /// Signed-in accounts, plus a card from the local logs for each provider that has none.
+    private static func catalogAccounts(_ store: AccountStore, localUsage: LocalUsageReader?, defaults: UserDefaults) -> [Account] {
+        let useLogs = localUsage != nil && defaults.object(forKey: LocalUsageReader.enabledKey) as? Bool ?? true
+        return store.accounts + (useLogs ? LocalUsageReader.accounts(besides: store.accounts) : [])
+    }
+
+    func localUsageSettingChanged() {
+        syncAccounts()
+        Task { await dataStore.refreshAll() }
+    }
+
     private func syncAccounts() {
         let previous = providers.map { ObjectIdentifier($0) }
         providers = ProviderCatalog.make(
-            accounts: accounts.accounts,
+            accounts: Self.catalogAccounts(accounts, localUsage: localUsage, defaults: defaults),
             vault: accounts.credentialVault,
             hubKeys: accounts.hubKeys,
             http: http,
             hubGate: hubGate,
             claudeSessions: claudeSessions,
+            localUsage: localUsage,
             reusing: providers
         )
         let registry = WidgetRegistry.from(providers)

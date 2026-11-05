@@ -13,10 +13,17 @@ enum ProviderCatalog {
         hubGate: CLIProxyHubGate = CLIProxyHubGate(),
         hubsEnabled: Bool = CLIProxyHub.isEnabled,
         claudeSessions: ClaudeSessions = ClaudeSessions(),
+        localUsage: LocalUsageReader? = nil,
         reusing existing: [AccountProviderRuntime] = []
     ) -> [AccountProviderRuntime] {
         let existingByID = Dictionary(existing.map { ($0.account.id, $0) }, uniquingKeysWith: { first, _ in first })
         return accounts.map { account in
+            let runtime = runtime(for: account)
+            runtime.localUsage = localUsage
+            return runtime
+        }
+
+        func runtime(for account: Account) -> AccountProviderRuntime {
             guard let runtime = existingByID[account.id], runtime.account.hub == account.hub else {
                 let client: any HTTPClient = switch account.hub {
                 case nil: http
