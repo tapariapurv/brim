@@ -81,18 +81,11 @@ extension View {
 }
 
 private struct CardSurfaceModifier: ViewModifier {
-    /// Share images render through `ImageRenderer`, which can't draw glass.
-    @Environment(\.drawsLevelsAsShapes) private var isRenderedImage
-
     func body(content: Content) -> some View {
-        if isRenderedImage {
-            content.background {
-                Theme.cardShape
-                    .fill(Theme.cardFill)
-                    .overlay { Theme.cardShape.strokeBorder(Theme.hairline, lineWidth: 0.5) }
-            }
-        } else {
-            content.background { Color.clear.glassEffect(.regular, in: Theme.cardShape) }
+        content.background {
+            Theme.cardShape
+                .fill(Theme.cardFill)
+                .overlay { Theme.cardShape.strokeBorder(Theme.hairline, lineWidth: 0.5) }
         }
     }
 }

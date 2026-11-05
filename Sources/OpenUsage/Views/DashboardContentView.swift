@@ -3,6 +3,7 @@ import SwiftUI
 struct DashboardContentView: View {
     @Environment(LayoutStore.self) private var layout
     @Environment(PopoverState.self) private var popover
+    @Environment(\.reduceAnimations) private var reduceAnimations
     let reorderSpaceName: String
 
     @Binding var reorderLift: ReorderLift?
@@ -33,15 +34,21 @@ struct DashboardContentView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 22)
         } else {
-            switch popover.dashboardTab {
-            case .priority:
-                PriorityDashboardView()
-            case .allUsage:
-                WidgetGroupedListView(
-                    reorderSpaceName: reorderSpaceName,
-                    reorderLift: $reorderLift
-                )
+            // Offset only: see DashboardView.modeBody for why these never fade.
+            ZStack(alignment: .top) {
+                switch popover.dashboardTab {
+                case .priority:
+                    PriorityDashboardView()
+                        .transition(.move(edge: .leading))
+                case .allUsage:
+                    WidgetGroupedListView(
+                        reorderSpaceName: reorderSpaceName,
+                        reorderLift: $reorderLift
+                    )
+                    .transition(.move(edge: .trailing))
+                }
             }
+            .animation(reduceAnimations ? nil : Motion.navigation, value: popover.dashboardTab)
         }
     }
 }

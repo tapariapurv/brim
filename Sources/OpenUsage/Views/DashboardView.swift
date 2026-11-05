@@ -11,6 +11,7 @@ struct DashboardView: View {
     @State private var didEstablishHeight = false
     @State private var measuredIdeal = MeasuredPanelHeights()
     @State private var isOpening = false
+    @State private var tabSwitching = false
     @State private var slideProgress: CGFloat = 1
     @State private var animatedSlideID = 0
     /// The `popover.screenSlideID` whose slide has ended. Until the store's id lands here the pager keeps
@@ -28,7 +29,11 @@ struct DashboardView: View {
         return modeBody
             .frame(width: PanelMetrics.width)
             .frame(maxHeight: .infinity, alignment: .top)
-            .background { BrimBackdrop().glassEffect(.regular, in: .rect(cornerRadius: MenuBarPanel.cornerRadius)) }
+            .background {
+                BrimBackdrop()
+                    .background(Theme.panelBody.opacity(0.8))
+                    .glassEffect(.regular, in: .rect(cornerRadius: MenuBarPanel.cornerRadius))
+            }
             .modifier(PanelHeightModifier(height: animatedHeight))
             .overlay(alignment: .topLeading) {
                 if let reorderLift {
@@ -84,6 +89,13 @@ struct DashboardView: View {
                 if screen == .accounts { Task { await container.hubs.syncDue(maxAge: 60) } }
             }
             .onChange(of: popover.customizeProviderID) { reorderLift = nil }
+            .onChange(of: popover.dashboardTab) {
+                tabSwitching = true
+                Task { @MainActor in
+                    try? await Task.sleep(for: .milliseconds(300))
+                    tabSwitching = false
+                }
+            }
             // Each screen switch: pin to the outgoing screen for one render (`slideProgress = 0`),
             // then spring to the incoming one on the next runloop tick. Deferring the animation one
             // tick is what makes it animate — setting 0 then 1 in the same closure collapses to a
@@ -130,6 +142,8 @@ struct DashboardView: View {
                 if !didEstablishHeight {
                     didEstablishHeight = true
                     animatedHeight = target
+                } else if tabSwitching, abs(target - animatedHeight) > 1, !reduceAnimations {
+                    withAnimation(Motion.navigation) { animatedHeight = target }
                 } else if isOpening || !isSliding {
                     // Outside a screen slide the panel takes its new size in one step, like a native window.
                     animatedHeight = target

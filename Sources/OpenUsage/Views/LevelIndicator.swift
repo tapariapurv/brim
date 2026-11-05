@@ -5,53 +5,40 @@ extension EnvironmentValues {
     @Entry var drawsLevelsAsShapes = false
 }
 
-/// A limit's level as Apple's progress bar, with a tick where it would be at an even pace.
+/// A limit's level as a thick capsule, with a tick where it would be at an even pace.
 struct LevelIndicator: View {
     let fill: Double
     let severity: WidgetData.MeterSeverity
     var paceMark: Double?
 
-    @Environment(\.drawsLevelsAsShapes) private var drawsAsShapes
+    @Environment(\.reduceAnimations) private var reduceAnimations
 
-    private static let shape = RoundedRectangle(cornerRadius: 2, style: .continuous)
-    private static let shortestFill: CGFloat = 4
+    private static let height: CGFloat = 7
+    private var clamped: Double { min(max(fill, 0), 1) }
 
     var body: some View {
-        level
+        Capsule()
+            .fill(Theme.meterTrack)
+            .overlay(alignment: .leading) {
+                if clamped > 0 {
+                    GeometryReader { proxy in
+                        let color = Theme.severityColor(severity)
+                        Capsule()
+                            .fill(LinearGradient(colors: [color.opacity(0.82), color], startPoint: .leading, endPoint: .trailing))
+                            .overlay(alignment: .top) { Capsule().fill(.white.opacity(0.18)).frame(height: 2).padding(.horizontal, 2).padding(.top, 1) }
+                            .frame(width: max(Self.height, (proxy.size.width * clamped).rounded()))
+                    }
+                }
+            }
+            .frame(height: Self.height)
+            .animation(reduceAnimations ? nil : .smooth(duration: 0.5), value: clamped)
             .overlay {
                 if let paceMark {
                     Capsule()
                         .fill(Theme.paceMark)
-                        .frame(width: 2, height: 12)
+                        .frame(width: 2, height: 11)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .visualEffect { content, proxy in content.offset(x: proxy.size.width * paceMark - 1) }
-                        .accessibilityHidden(true)
-                }
-            }
-    }
-
-    @ViewBuilder
-    private var level: some View {
-        if drawsAsShapes {
-            shapes
-        } else {
-            ProgressView(value: min(max(fill, 0), 1))
-                .progressViewStyle(.linear)
-                .tint(Theme.severityColor(severity))
-                .accessibilityHidden(true)
-        }
-    }
-
-    private var shapes: some View {
-        Self.shape
-            .fill(Theme.meterTrack)
-            .overlay(alignment: .leading) {
-                if fill > 0 {
-                    GeometryReader { proxy in
-                        Self.shape
-                            .fill(Theme.severityColor(severity))
-                            .frame(width: max(Self.shortestFill, (proxy.size.width * min(fill, 1)).rounded()))
-                    }
                 }
             }
             .accessibilityHidden(true)
