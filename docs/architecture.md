@@ -1,17 +1,17 @@
 # Architecture
 
-OpenUsage is a SwiftPM package with three targets:
+Brim is a SwiftPM package with three targets:
 
-- `OpenUsage`: the library, where everything lives.
+- `Brim`: the library, where everything lives.
 - `OpenUsageApp`: a thin executable.
-- `OpenUsageCLI`: the `openusage` command, shipped at `Contents/Helpers/openusage`.
+- `OpenUsageCLI`: the `brim` command, shipped at `Contents/Helpers/openusage`.
 
 It uses Swift 6 with strict concurrency, and SwiftUI inside an AppKit status item and panel.
 
 ## Composition root
 
 `AppDelegate` (`App/OpenUsageApp.swift`) builds `AppContainer`, starts the refresh loop, creates
-`StatusItemController`, and starts Sparkle. It also imports the OpenRouter and Z.ai keys 0.7.x saved
+`StatusItemController`. It also imports the OpenRouter and Z.ai keys 0.7.x saved
 (`Stores/APIKeyV1Files.swift`).
 
 `AppContainer` (`App/AppContainer.swift`) owns the long-lived stores:
@@ -73,7 +73,7 @@ into data for the views.
 ## Command line
 
 `OpenUsageCLI` finds the app bundle it ships inside and hands off to `UsageReader`, which reads
-the stored accounts and the snapshot cache. `LimitsEnvelope` writes the `openusage.limits.v2`
+the stored accounts and the snapshot cache. `LimitsEnvelope` writes the `brim.limits.v2`
 JSON. The command never refreshes and never opens the Keychain.
 
 ## Views
@@ -88,9 +88,6 @@ JSON. The command never refreshes and never opens the Keychain.
 
 ## Updates, telemetry, and logging
 
-- `UpdaterController` wraps Sparkle. Only `script/release.sh` writes `SUFeedURL`, so dev builds never
-  check for updates. See [Updates](updates.md).
-- `PostHogTelemetrySink` sends the anonymous daily ping, crash reports, and optional daily account
-  counts by provider. Events name providers, never accounts. See [Privacy](privacy.md).
-- `AppLog` writes to unified logging (subsystem `OpenUsage`). It drops lines below the level set in
+- `NoTelemetrySink` discards everything; upstream's recorder stays only to keep merges simple.
+- `AppLog` writes to unified logging (subsystem `Brim`). It drops lines below the level set in
   Settings and redacts every message with `LogRedaction`. See [Debugging](debugging.md).

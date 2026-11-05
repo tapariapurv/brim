@@ -1,3 +1,5 @@
+> Entries below are from upstream [OpenUsage](https://github.com/robinebers/openusage), up to the point Brim forked.
+
 # Changelog
 
 ## v0.8.0-beta.3

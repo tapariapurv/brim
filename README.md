@@ -1,160 +1,40 @@
-# OpenUsage
+# Brim
 
-Track your AI coding subscriptions from the macOS menu bar.
+A native macOS menu-bar app for your AI usage limits, in Liquid Glass.
 
-OpenUsage shows how much of each AI plan you've used: session and weekly limits, credits, and
-balances, all in one panel. The limits closest to running out sit right in the menu bar.
+> **Brim is an unofficial fork of [OpenUsage](https://github.com/robinebers/openusage) by Robin Ebers.** Nearly all of the app, its providers and its architecture come from that project. Brim isn't affiliated with or endorsed by OpenUsage. As [its trademark policy](TRADEMARK.md) requires, this fork has its own name and logo. Internal Swift modules keep the `OpenUsage` name so upstream changes stay easy to merge.
 
-| | Light | Dark |
-| --- | --- | --- |
-| **Priority** | <img src="assets/priority-light.jpg" alt="OpenUsage Priority tab in light mode, with pinned limits, limits running out, and a used-up limit" width="400"> | <img src="assets/priority-dark.jpg" alt="OpenUsage Priority tab in dark mode, with pinned limits, limits running out, and a used-up limit" width="400"> |
-| **All Usage** | <img src="assets/all-usage-light.jpg" alt="OpenUsage All Usage tab in light mode, with Claude, ChatGPT, and Cursor usage" width="400"> | <img src="assets/all-usage-dark.jpg" alt="OpenUsage All Usage tab in dark mode, with Claude, ChatGPT, and Cursor usage" width="400"> |
+![Brim's panel](assets/brim-panel.png)
 
-## Installation
+## What Brim changes
 
-- **Homebrew:**
+- **Liquid Glass throughout.** Requires macOS 26 or later.
+- **Backgrounds.** Liquid Fill (rises with your most-used limit), Aurora, Sunset or None, in Settings > Display.
+- **Your refresh interval.** 1 minute to 1 hour, in Settings > General.
+- **Fewer blocked Claude refreshes.** See below.
+- **No analytics and no auto-updates.** Brim sends nothing to the original project. Update by rebuilding.
+- **[Raycast extension](raycast/).** Your limits from the keyboard.
 
-  ```sh
-  brew install --cask openusage
-  ```
+## Claude refreshes
 
-- **Direct download:** grab the latest universal DMG from the
-  [releases page](https://github.com/robinebers/openusage/releases/latest), open it, and drag
-  OpenUsage to your Applications folder.
+Anthropic allows about 30 usage requests an hour per account, shared with Claude Code and any other monitor. Brim stays under that rather than around it:
 
-The app updates itself with signed, notarized [Sparkle](docs/updates.md) updates. Requires macOS 15
-(Sequoia) or later, on Apple Silicon or Intel.
+- Refresh sends one request instead of three.
+- Requests are at least a minute apart when you press Refresh, 5 minutes on a schedule, and capped at 20 an hour. A press inside those limits keeps the last reading.
+- If Anthropic still pauses checks, Brim keeps showing the last reading and when it will check next.
 
-## Supported Providers
+**Claude Code Live Feed** (Settings > General) goes further: it adds a status line to Claude Code that saves your 5-hour and weekly limits to `~/.brim/claude-feed.json`, with no request to Anthropic. It updates while Claude Code is active, and the API is then read about every 30 minutes for the other rows. Use it with one Claude login in Brim, the same one Claude Code uses. It won't replace a status line you already have, and it backs up `settings.json` to `settings.json.brim-backup` first.
 
-- **[Claude](docs/providers.md#claude)**: session, weekly, model limits, extra usage (Enterprise spend), rate-limit resets
-- **[ChatGPT](docs/providers.md#chatgpt)**: session, weekly, Spark, extra usage, credit limit, rate-limit resets, daily tokens
-- **[Cursor](docs/providers.md#cursor)**: total usage, model usage, extra usage, requests, credits, daily spend and tokens
-- **[Antigravity](docs/providers.md#antigravity)**: Gemini and Claude quotas
-- **[Copilot](docs/providers.md#copilot)**: credits, extra usage, chat, completions, organization billing, GitHub Enterprise on GHE.com
-- **[Devin](docs/providers.md#devin)**: daily and weekly quota, extra usage
-- **[Grok](docs/providers.md#grok)**: weekly limit, extra usage
-- **[Muse Code](docs/providers.md#muse-code)**: session, weekly
-- **[Ollama](docs/providers.md#ollama)**: session, weekly, monthly, extra usage, daily usage and tokens
-- **[OpenCode](docs/providers.md#opencode)**: session, weekly, monthly
-- **[OpenRouter](docs/providers.md#openrouter)**: balance, spend, key limit, budget
-- **[Z.ai](docs/providers.md#zai)**: session, weekly, web searches, rate-limit resets
-- **[CLIProxyAPI hubs](docs/cliproxyapi.md)**: every Claude, ChatGPT, Antigravity, Devin, and Grok login on
-  a [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) server
+## Building
 
-Add your accounts from the app's Accounts screen. OpenUsage never reads other tools' credentials,
-files, or logs. See [Accounts](docs/accounts.md). Coming from 0.7.x? See
-[Upgrading from 0.7.x](docs/settings.md#upgrading-from-07x).
+```sh
+swift build
+script/test_quiet.sh
+./script/build_and_run.sh
+```
 
-## Features
-
-- **Menu bar.** The limits closest to running out, at a glance.
-- **Priority.** What's running low, what's used up, and which accounts need you.
-- **All Usage.** Every account and limit in one place, with resets, your pace, and an optional mark
-  where an even pace would be.
-- **Your layout.** Pin the metrics you care about, hide the rest, and drag everything into your order.
-- **Rate-limit resets.** See and spend Claude and ChatGPT resets.
-- **Share.** Copy a picture of your usage to the clipboard.
-- **Notifications.** A heads-up before a limit runs out, or before a weekly limit resets with most of
-  it unused.
-- **Priority limits.** Choose how much left turns a limit orange or red, see limits you're burning
-  through too fast while they still have plenty left, and see limits about to reset mostly unused.
-- **Global shortcut.** Toggle the panel from anywhere.
-- **[Command line](docs/cli.md).** Your usage as JSON, for scripts and agents.
-- **[Automatic updates](docs/updates.md).** Signed, notarized updates, with an optional beta channel.
-- **[Proxy support](docs/proxy.md).** Route provider requests through a SOCKS5, HTTP, or HTTPS proxy.
-
-## Documentation
-
-How everything works, in [docs/](docs/README.md):
-
-- [Dashboard](docs/dashboard.md)
-- [Accounts](docs/accounts.md) and [CLIProxyAPI hubs](docs/cliproxyapi.md)
-- [Providers](docs/providers.md)
-- [Menu bar](docs/menu-bar.md)
-- [Settings](docs/settings.md)
-- [Refreshing](docs/refreshing.md)
-- [Command line](docs/cli.md)
-- [Updates](docs/updates.md)
-- [Proxy](docs/proxy.md)
-- [Privacy](docs/privacy.md), including optional daily provider account counts
+The app is staged at `dist/Brim.app`. See [docs/](docs/) for behavior and architecture.
 
 ## License
 
-[MIT](LICENSE)
-
----
-
-<details>
-<summary><strong>Build from source</strong></summary>
-
-```sh
-swift build                 # debug build
-script/test_quiet.sh        # run the tests without them taking the keyboard or the screen
-./script/build_and_run.sh   # build and launch the dev app from dist/
-```
-
-`script/test_quiet.sh` takes `swift test` arguments such as `--filter`. The dev app has its own
-bundle identifier, so it runs beside an installed OpenUsage. See [debugging](docs/debugging.md).
-
-To learn the code, read the [architecture overview](docs/architecture.md),
-[adding a provider](docs/adding-a-provider.md), and [AGENTS.md](AGENTS.md).
-
-</details>
-
-<details>
-<summary><strong>Releasing</strong></summary>
-
-Push a `v*` tag on `main` to build, sign, notarize, and publish a release:
-
-- A plain tag (`v0.8.0`) ships to everyone.
-- A pre-release tag (`v0.8.0-beta.1`) ships to the beta channel.
-
-The pipeline is [release.yml](.github/workflows/release.yml), and the steps are in the
-`release-swift` skill.
-
-### Release setup (one-time)
-
-The workflow needs these repository secrets (Settings → Secrets and variables → Actions):
-
-| Secret                       | What it is                                                            |
-| ---------------------------- | --------------------------------------------------------------------- |
-| `APPLE_CERTIFICATE`          | base64 of your Developer ID Application `.p12`                        |
-| `APPLE_CERTIFICATE_PASSWORD` | the password set when exporting that `.p12`                           |
-| `APPLE_ID`                   | the Apple ID email used for notarization                              |
-| `APPLE_PASSWORD`             | an app-specific password for that Apple ID                            |
-| `APPLE_TEAM_ID`              | your Apple Developer team ID                                          |
-| `SPARKLE_PUBLIC_KEY`         | base64 EdDSA public key, baked into the build as `SUPublicEDKey`      |
-| `SPARKLE_PRIVATE_KEY`        | base64 EdDSA private key used to sign the DMG                         |
-| `POSTHOG_CLI_API_KEY`        | PostHog personal API key used to upload dSYMs for crash symbolication |
-| `POSTHOG_CLI_PROJECT_ID`     | numeric PostHog project ID the dSYMs upload to                        |
-
-- Export the Developer ID Application certificate, with its private key, from Keychain Access as a
-  `.p12`. Then run `base64 -i DeveloperID.p12 | pbcopy`.
-- Create the app-specific password at appleid.apple.com → Sign-In and Security → App-Specific
-  Passwords.
-- Generate the Sparkle key pair once with Sparkle's `generate_keys` tool. If the two keys don't match,
-  signing is silently skipped.
-- The `POSTHOG_CLI_*` secrets only upload dSYMs so crash reports symbolicate. Without
-  `POSTHOG_CLI_API_KEY`, the workflow skips the upload with a warning and the release still ships.
-  The key comes from PostHog → Settings → Personal API keys, and the project ID is the number in your
-  project URL.
-- Keep the repository public, because Sparkle fetches the DMG and appcast anonymously. After the first
-  release, confirm that Settings → Pages → Source is GitHub Actions; `deploy-pages.yml` publishes `gh-pages`.
-
-</details>
-
-<details>
-<summary><strong>Contributing</strong></summary>
-
-Pull requests are issue-first:
-
-1. Comment on an issue.
-2. Wait for a maintainer to add the `approved` label and assign it to you.
-3. Open your PR with `Fixes #123`.
-
-Automation closes external PRs that skip this. Read [CONTRIBUTING.md](CONTRIBUTING.md) first. Report
-security issues privately per [SECURITY.md](SECURITY.md). The OpenUsage name and logo are covered by
-the [trademark policy](TRADEMARK.md).
-
-</details>
+[MIT](LICENSE), keeping the original copyright of Robin Ebers. The OpenUsage name and logo aren't covered; see [TRADEMARK.md](TRADEMARK.md).

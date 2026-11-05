@@ -13,6 +13,7 @@ struct SettingsScreen: View {
     @AppStorage(PaceMilestone.closeToRunningOut.settingKey) private var closeToRunningOut = false
     @AppStorage(PaceMilestone.useItOrLoseIt.settingKey) private var useItOrLoseIt = false
     @AppStorage(LogLevelSetting.key) private var logLevel = LogLevelSetting.info
+    @AppStorage(BackdropStyle.key) private var backdrop = BackdropStyle.liquid
     @AppStorage(RefreshSetting.key) private var refreshMinutes = RefreshSetting.defaultMinutes
     @State private var claudeFeed = ClaudeFeedInstaller()
     @State private var launchAtLogin = LaunchAtLoginSetting()
@@ -88,6 +89,9 @@ struct SettingsScreen: View {
     @ViewBuilder
     private var displayTab: some View {
         @Bindable var dataStore = dataStore
+        Section {
+            picker("Background", selection: $backdrop, options: BackdropStyle.allCases.map { ($0, $0.label) })
+        }
         Section {
             PriorityIconsPreview()
             picker("Show In Menu Bar", selection: $dataStore.menuBarLimit, options: MenuBarLimit.allCases.map { ($0, $0.label) })

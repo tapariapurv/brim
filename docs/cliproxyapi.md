@@ -2,9 +2,9 @@
 
 [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) is a server that keeps sign-ins for
 several people or machines. Connect a hub, and its Claude, ChatGPT, Antigravity, Devin, and Grok
-logins show in OpenUsage as ordinary accounts.
+logins show in Brim as ordinary accounts.
 
-- The hub owns the list of logins. OpenUsage mirrors it.
+- The hub owns the list of logins. Brim mirrors it.
 - You can connect more than one hub.
 - The hub must allow remote management (`allow-remote` in its config), unless it runs on this Mac.
 
@@ -31,7 +31,7 @@ A hub account works like any other account and carries the CLIProxyAPI mark.
 
 ## Staying in sync
 
-OpenUsage reads the hub's login list at launch, when Accounts opens, and about once an hour.
+Brim reads the hub's login list at launch, when Accounts opens, and about once an hour.
 
 - A login added on the hub appears at the bottom of its provider's accounts.
 - A login removed on the hub disappears once two reads in a row miss it.
@@ -40,7 +40,7 @@ OpenUsage reads the hub's login list at launch, when Accounts opens, and about o
   pins.
 
 Logins for unsupported providers don't show. That includes Cursor, because the hub holds a Cursor
-API key and Cursor's usage reads need OpenUsage's own sign-in.
+API key and Cursor's usage reads need Brim's own sign-in.
 
 ## The hub in Accounts
 
@@ -67,14 +67,14 @@ shows the last error, its accounts, and how many logins aren't supported yet.
 | The management key for the CLIProxyAPI hub at <host> is missing | **Replace Management Key…**, or remove the hub |
 | … isn't the address its management key was saved for | Remove the hub and connect it again |
 
-After the hub rejects the key or bans this Mac, OpenUsage sends it nothing until you replace the
+After the hub rejects the key or bans this Mac, Brim sends it nothing until you replace the
 key.
 
 ## What the management key can do
 
 The management key is the hub's admin key. It can read and change the hub's logins and settings.
 
-- OpenUsage keeps it in its own Keychain service, `com.robinebers.openusage.cliproxy-hubs`.
+- Brim keeps it in its own Keychain service, `com.robinebers.openusage.cliproxy-hubs`.
 - It sends the key only to the address you connected.
 - It only lists logins and sends usage reads and reset claims through the hub's `api-call`. The hub
   adds each login's token, so no provider token reaches this Mac.

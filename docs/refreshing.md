@@ -1,6 +1,6 @@
 # Refreshing
 
-OpenUsage refreshes every account every 5 minutes. There is no setting for the interval.
+Brim refreshes every account every 5 minutes. There is no setting for the interval.
 
 ## When data updates
 
@@ -47,7 +47,7 @@ An account that failed waits before the next try:
 - No extra wait if it never reached the provider, such as with no internet.
 - A manual refresh skips the wait.
 
-When a provider rate-limits OpenUsage (HTTP 429, or GitHub's HTTP 403), the account waits as long as
+When a provider rate-limits Brim (HTTP 429, or GitHub's HTTP 403), the account waits as long as
 `Retry-After` asks, up to an hour, or on the doubling schedule. Claude's wait covers every card
 signed in to the same Anthropic login, and survives a relaunch.
 
@@ -55,13 +55,13 @@ An account that doesn't answer within two minutes shows "Refresh timed out after
 again on a later pass.
 
 Values more than two refresh cycles old get a clock next to the account's name, and the
-[`openusage` command](cli.md) marks them `"stale": true`.
+[`brim` command](cli.md) marks them `"stale": true`.
 
 ## Expired sign-ins
 
 OAuth accounts renew their sign-in 5 minutes before it expires. Cursor renews in the last 7 days of
 its 60-day token. If Claude, ChatGPT, Grok, or Antigravity refuses the token anyway (HTTP 401),
-OpenUsage renews once and retries.
+Brim renews once and retries.
 
 If the provider still refuses the token or refuses the renewal, the warning says the sign-in
 expired. Use **Sign In Again…** on the account's page.
@@ -69,3 +69,7 @@ expired. Use **Sign In Again…** on the account's page.
 Other renewal failures, such as an outage, a rate limit, or no connection, don't mean the sign-in
 expired. The account keeps its current token while it works and retries the renewal on the next
 pass. Once the token expires, the refresh fails like any [failed fetch](#when-a-fetch-fails).
+
+## Brim
+
+The interval is yours to set in Settings > General. Claude reads are spaced and capped, and can come from the Claude Code Live Feed instead. See the [README](../README.md#claude-refreshes).

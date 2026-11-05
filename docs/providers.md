@@ -3,7 +3,7 @@
 How each provider signs in and what its card shows.
 
 - Every value comes from the provider's API. The one estimate is ChatGPT's credits, at 4¢ each.
-- OpenUsage computes no spend from logs and applies no model pricing. A metric the provider does not
+- Brim computes no spend from logs and applies no model pricing. A metric the provider does not
   report stays hidden.
 - Time ranges (Today, Yesterday, This Week, and the like) always show, at 0 when the provider
   reports nothing.
@@ -37,11 +37,11 @@ did. The token is stored in the app's Keychain.
 | ChatGPT | `openid profile email offline_access` | Plain OpenID Connect. The email names the account. |
 | Cursor | none | Cursor's sign-in returns a dashboard session with no scopes. |
 | Antigravity | `cloud-platform`, `userinfo.email` | Google's quota API requires `cloud-platform`. |
-| Copilot | `read:user` (ignored by GitHub) | GitHub ignores the scopes a GitHub App asks for, so OpenUsage cannot narrow the token. It reads only your login and your quota with it. |
+| Copilot | `read:user` (ignored by GitHub) | GitHub ignores the scopes a GitHub App asks for, so Brim cannot narrow the token. It reads only your login and your quota with it. |
 | Copilot organization | none; you create the token | A fine-grained personal access token with Organization permissions, Administration, Read-only, from an organization owner or billing manager. |
-| Devin | `openid profile email` | OpenUsage trades the token for the account's API key, the same key Windsurf's editor plugins use. |
-| Grok | `openid email offline_access grok-cli:access` | OpenUsage doesn't ask for `api:access`, which would let the token run Grok models. |
-| Muse Code | none | Meta's device sign-in takes no scopes. The usage read also returns the account's Model API key, which OpenUsage never reads or stores. |
+| Devin | `openid profile email` | Brim trades the token for the account's API key, the same key Windsurf's editor plugins use. |
+| Grok | `openid email offline_access grok-cli:access` | Brim doesn't ask for `api:access`, which would let the token run Grok models. |
+| Muse Code | none | Meta's device sign-in takes no scopes. The usage read also returns the account's Model API key, which Brim never reads or stores. |
 
 A narrower grant applies the next time you add an account. To get it for an existing account, remove
 the account and add it again. Claude is the exception: a refreshed Claude token carries only

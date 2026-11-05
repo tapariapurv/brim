@@ -28,7 +28,7 @@ struct DashboardView: View {
         return modeBody
             .frame(width: PanelMetrics.width)
             .frame(maxHeight: .infinity, alignment: .top)
-            .background(Theme.panelBody)
+            .background { BrimBackdrop().glassEffect(.regular, in: .rect(cornerRadius: MenuBarPanel.cornerRadius)) }
             .modifier(PanelHeightModifier(height: animatedHeight))
             .overlay(alignment: .topLeading) {
                 if let reorderLift {

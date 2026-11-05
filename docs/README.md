@@ -1,4 +1,4 @@
-# OpenUsage documentation
+# Brim documentation
 
 How the app behaves. If the app and a page here disagree, that is a bug.
 
@@ -10,12 +10,11 @@ How the app behaves. If the app and a page here disagree, that is a bug.
   CLIProxyAPI server
 - [Menu bar](menu-bar.md): what the strip shows
 - [Settings](settings.md): every option, and what carries over from 0.7.x
-- [Command line](cli.md): the `openusage` command and its JSON output
+- [Command line](cli.md): the `brim` command and its JSON output
 - [Refreshing](refreshing.md): when data updates and what happens when a fetch fails
 - [Providers](providers.md): how each provider signs in and what it shows
-- [Updates](updates.md): automatic updates, manual checks, and the beta channel
 - [Proxy](proxy.md): sending provider requests through a proxy
-- [Privacy](privacy.md): what stays on your Mac and what the anonymous telemetry sends
+- [Privacy](privacy.md): what stays on your Mac
 
 ## For developers
 

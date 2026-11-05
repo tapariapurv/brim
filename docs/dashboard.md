@@ -126,16 +126,16 @@ account. Emails are left out.
 
 When a scheduled check finds a new version, an **Update Available** card shows above the provider
 cards. **Install Update** opens the update window, and ✕ hides the card until the next check. See
-[Updates](updates.md).
+Updates.
 
 ## Footer
 
-- **OpenUsage** and the version, like `OpenUsage 0.8.0`, sit over **Next update in …**, which counts
+- **Brim** and the version, like `Brim 0.8.0`, sit over **Next update in …**, which counts
   down to the next refresh. Click it or press **⌘R** to refresh now. A dev build shows its commit,
   like `dev (abc1234)`.
 - On Priority, a button copies the tab as a PNG with emails hidden.
 - The **⋯** menu has **Accounts**, **Settings**, **Check for Updates…**, **Report an Issue…**,
-  **About OpenUsage**, and **Quit OpenUsage**.
+  **About Brim**, and **Quit Brim**.
 
 ## Keyboard
 

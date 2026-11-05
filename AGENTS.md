@@ -1,6 +1,6 @@
 # AGENTS.md
 
-OpenUsage is a SwiftPM-based macOS menu-bar app that shows the usage limits of the AI coding accounts a
+Brim is a SwiftPM-based macOS menu-bar app that shows the usage limits of the AI coding accounts a
 user adds within the app (Claude, Codex, Cursor, Copilot, Antigravity, Devin, Grok, Muse Code, Ollama,
 OpenCode, OpenRouter, Z.ai).
 
@@ -12,28 +12,7 @@ AGENTS.md is the source of truth for agent instructions in this repository. CLAU
 point to the nearest AGENTS.md file with `@AGENTS.md`; do not add guidance, duplicate instructions, or
 project rules to CLAUDE.md.
 
-> **Repository note:** This is the native Swift edition of OpenUsage. Active development happens on the
-> `main` branch. (NOT the legacy Tauri version which now sits in the `tauri-legacy` branch)
-
-## Releases
-
-`main` is the active development line; it ships via `.github/workflows/release.yml` (Sparkle appcast
-on `gh-pages`). Cut releases with the release-swift skill.
-
-### Guardrails (do not break)
-- Versions are `0.7.x` and up. Never reuse a `0.6.x` number — those are the original edition's released
-  tags, now frozen on the `tauri-legacy` branch (final release `v0.6.28`).
-- **Never increase the version number on your own initiative — always ask for explicit approval
-  first.** The version is a deliberate owner decision: propose the number and wait for explicit
-  sign-off before tagging or cutting a release.
-- Beta releases use `-beta.N` tags and stay GitHub pre-releases on Sparkle's beta channel. Stable
-  releases use plain tags and become GitHub "Latest".
-- Stable releases must carry forward the legacy `latest.json` so any remaining `0.6.x` installs can
-  still update to `v0.6.28`. `release.yml` handles this; verify it with the release-swift skill.
-- Never leave a release in Draft, and never ship blank notes: the release-swift skill generates the
-  changelog and verifies the published release after every cut.
-- The appcast URL and the Sparkle public key in `script/release.sh` identify the app to every installed
-  copy. Never change them.
+> **Fork note:** Brim is a fork of robinebers/openusage. Internal modules keep the OpenUsage name to ease upstream merges; anything user-visible says Brim. Never use the OpenUsage name or logo as Brim's own.
 
 ## Architecture
 
@@ -43,7 +22,7 @@ on `gh-pages`). Cut releases with the release-swift skill.
   Keychain service.
 - Users initiate all provider sign-ins from the popover's Accounts screen. Never discover credentials
   or accounts from other tools, and never read their files, Keychain items, SQLite databases, or
-  environment variables.
+  environment variables. The one exception is the opt-in Claude Code Live Feed: its status line writes Brim's own `~/.brim/claude-feed.json`, and turning it on edits Claude Code's `statusLine` setting.
 - Each account has one provider runtime. The runtime calls the provider API and maps its response to
   dashboard metrics. Do not add log scanning, spend estimates, or external pricing; the one exception
   is ChatGPT's credits, priced at 4¢ each in `CodexUsageMapper`.
@@ -83,21 +62,7 @@ every change to a header, to renaming, or to the Options menu, or they rot unsee
 
 There is no hot reload. The app is a long-lived menu-bar process, so **every code change requires a
 full rebuild and restart of the running app** to take effect. The development bundle identifier is
-`com.robinebers.openusage.dev`; it never touches the installed app's settings or Keychain items.
-
-## Pull Requests
-
-Every PR description must follow this structure so reviewers can skim it quickly:
-
-- **TL;DR** — open with a one- or two-sentence plain-English summary of the change.
-- **What was happening** — plain-English bullet points describing the prior behavior, bug, or gap that
-  motivated the change.
-- **What this changes** — bullet points describing what the PR actually changes.
-- **Heads-up** (optional) — noteworthy things a reviewer or future maintainer should consider (risks,
-  follow-ups, trade-offs).
-- **Tests** (optional) — how the change was verified.
-- **Screenshots** (optional in general, but **required for any PR that makes a visual change**) —
-  images of the affected UI after the change.
+`com.tapariapurv.brim.dev`; it never touches the installed app's settings or Keychain items.
 
 ## Documentation
 
@@ -123,6 +88,6 @@ response bodies.
 ## UI
 
 - Use title case for any hardcoded copy used as a title.
-- Match the existing macOS design language; OpenUsage has a specific look and feel.
+- Match the existing macOS design language; Brim has a specific look and feel.
 - Only add tooltips (`hoverTooltip`) when explicitly asked to. Don't add them proactively to new
   controls.

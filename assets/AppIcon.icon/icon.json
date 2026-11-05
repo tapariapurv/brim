@@ -5,7 +5,7 @@
   "fill-specializations" : [
     {
       "value" : {
-        "automatic-gradient" : "extended-srgb:0.17008,0.49616,1.02141,1.00000"
+        "automatic-gradient" : "extended-srgb:0.02000,0.62000,0.66000,1.00000"
       }
     },
     {
@@ -28,7 +28,7 @@
             {
               "appearance" : "dark",
               "value" : {
-                "solid" : "extended-srgb:0.17008,0.49616,1.02141,1.00000"
+                "solid" : "extended-srgb:0.02000,0.62000,0.66000,1.00000"
               }
             },
             {

@@ -1,6 +1,6 @@
 # Command line
 
-`openusage` prints the usage the app last fetched, as JSON, and exits. It never refreshes, signs in,
+`brim` prints the usage the app last fetched, as JSON, and exits. It never refreshes, signs in,
 reads a credential, or launches the app. The app fetches every 5 minutes while it runs (see
 [Refreshing](refreshing.md)).
 
@@ -18,9 +18,9 @@ openusage codex@1a2b3c4d   # one account, by its id
 ## Install on `PATH`
 
 - **Settings → Command Line → Install…** asks for an administrator password, then links
-  `/usr/local/bin/openusage` to the helper inside OpenUsage. App updates update the command too.
-- Install replaces a link left by another copy of OpenUsage, such as the one 0.7.x installed.
-- **Uninstall** removes the link. A file at that path that OpenUsage didn't install is left alone, and
+  `/usr/local/bin/openusage` to the helper inside Brim. App updates update the command too.
+- Install replaces a link left by another copy of Brim, such as the one 0.7.x installed.
+- **Uninstall** removes the link. A file at that path that Brim didn't install is left alone, and
   the setting reads **Unavailable**.
 
 ## Exit codes
@@ -29,7 +29,7 @@ openusage codex@1a2b3c4d   # one account, by its id
 |---|---|
 | 0 | Printed. |
 | 2 | Invalid arguments, or a provider argument that names no account. |
-| 4 | Nothing fetched yet for the named accounts. Open OpenUsage and add or refresh an account. The empty envelope still prints. |
+| 4 | Nothing fetched yet for the named accounts. Open Brim and add or refresh an account. The empty envelope still prints. |
 
 ## Output
 

@@ -62,7 +62,7 @@ struct PopoverFooter: View {
             Image(systemName: "doc.on.doc")
                 .font(.system(size: 12, weight: .semibold))
                 .frame(width: 26, height: 26)
-                .background(Theme.controlFill, in: Circle())
+                .glassEffect(.regular.interactive(), in: Circle())
                 .contentShape(Circle())
         }
         .buttonStyle(.plain)
@@ -101,7 +101,7 @@ struct PopoverFooter: View {
             Image(systemName: "ellipsis")
                 .font(.system(size: 13, weight: .semibold))
                 .frame(width: 26, height: 26)
-                .background(Theme.controlFill, in: Circle())
+                .glassEffect(.regular.interactive(), in: Circle())
                 .contentShape(Circle())
         }
         .menuStyle(.button)

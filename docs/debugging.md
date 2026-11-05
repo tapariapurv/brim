@@ -8,7 +8,7 @@
 ```
 
 - The dev bundle id is `com.robinebers.openusage.dev`. It keeps its own settings and Keychain items
-  and runs beside an installed OpenUsage.
+  and runs beside an installed Brim.
 - It has no update feed, so the Updates controls are disabled. It leaves alone the OpenRouter and Z.ai
   keys 0.7.x saved.
 - Only one dev build runs at a time. If one from another folder is running, `run` and `verify` fail
@@ -16,13 +16,13 @@
 
 ## Read the logs
 
-OpenUsage logs through unified logging under the subsystem `OpenUsage`, with categories such as
+Brim logs through unified logging under the subsystem `Brim`, with categories such as
 `refresh`, `http`, `auth`, `updates`, and `config`.
 
 ```sh
-log stream --info --predicate 'subsystem == "OpenUsage"'
-log stream --info --predicate 'subsystem == "OpenUsage" AND category == "refresh"'
-log show --last 2h --predicate 'subsystem == "OpenUsage" AND category == "refresh"'
+log stream --info --predicate 'subsystem == "Brim"'
+log stream --info --predicate 'subsystem == "Brim" AND category == "refresh"'
+log show --last 2h --predicate 'subsystem == "Brim" AND category == "refresh"'
 ```
 
 - macOS keeps info lines in memory only, so `log show` finds them for a few minutes at most. Each

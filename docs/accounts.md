@@ -56,7 +56,7 @@ account from a CLIProxyAPI hub, remove the login on the hub or remove the whole 
 ## Where things are stored
 
 Account names and the dashboard layout live in the app's preferences. Tokens and keys live in the
-app's own Keychain services. OpenUsage never reads other tools' credentials, files, Keychain items,
+app's own Keychain services. Brim never reads other tools' credentials, files, Keychain items,
 databases, or environment variables.
 
 ## Sign in again
