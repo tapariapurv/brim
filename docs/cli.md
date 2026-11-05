@@ -18,7 +18,7 @@ brim codex@1a2b3c4d   # one account, by its id
 ## Install on `PATH`
 
 - **Settings → Command Line → Install…** asks for an administrator password, then links
-  `/usr/local/bin/openusage` to the helper inside Brim. App updates update the command too.
+  `/usr/local/bin/brim` to the helper inside Brim. App updates update the command too.
 - Install replaces a link left by another copy of Brim, such as the one 0.7.x installed.
 - **Uninstall** removes the link. A file at that path that Brim didn't install is left alone, and
   the setting reads **Unavailable**.

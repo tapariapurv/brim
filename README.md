@@ -13,7 +13,7 @@ A native macOS menu-bar app for your AI usage limits, in Liquid Glass.
 - **Your refresh interval.** 1 minute to 1 hour, in Settings > General.
 - **Fewer blocked Claude refreshes.** See below.
 - **No analytics and no auto-updates.** Brim sends nothing to the original project. Update by rebuilding.
-- **[Raycast extension](raycast/).** Your limits from the keyboard.
+- **[Raycast extension](raycast/).** Type `cc` in Raycast to open your limits, with current, average and estimated usage.
 
 ## Claude refreshes
 
