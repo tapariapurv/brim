@@ -112,14 +112,22 @@ private struct MenuBarTextStrip: View {
         .compositingGroup()
     }
 
+    @ViewBuilder
     private func labelledValue(_ item: MenuBarContent.Item) -> some View {
-        VStack(alignment: .leading, spacing: -2) {
-            Text(item.shortLabel)
-                .font(.system(size: 9, weight: .medium))
+        if item.label == MenuBarContentBuilder.sessionTitle {
+            // The session is the strip's standing item: its mark and number say enough.
             Text(item.value)
-                .font(.system(size: 11, weight: .bold))
+                .font(.system(size: 13, weight: .bold))
+                .fixedSize()
+        } else {
+            VStack(alignment: .leading, spacing: -2) {
+                Text(item.shortLabel)
+                    .font(.system(size: 9, weight: .medium))
+                Text(item.value)
+                    .font(.system(size: 11, weight: .bold))
+            }
+            .fixedSize()
         }
-        .fixedSize()
     }
 
     private func overflowCount(_ count: Int) -> some View {

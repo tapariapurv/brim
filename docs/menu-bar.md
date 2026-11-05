@@ -2,6 +2,7 @@
 
 The strip shows the metrics you choose or, with none chosen, the limits closest to running out.
 
+- A session limit always shows, as the provider's mark and its value with no label, unless you choose **App Icon Only**.
 - Choose metrics in **Settings → General → Menu Bar Items**, or right-click a metric on All Usage and pick **Show In Menu Bar**. They show in the order you added them, whatever their level.
 
 - Left-click the icon to open the panel. Right-click (or control-click) it for **Settings** and

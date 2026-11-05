@@ -79,6 +79,14 @@ final class MenuBarContentTests: XCTestCase {
         XCTAssertEqual(strip.overflow, 1, "only Lower waits; Spent and Spent Too aren't running out")
     }
 
+    func testASessionLimitLeadsTheStripOnceAndOnlyOnce() {
+        let accounts = [account(personal, limit("Weekly", used: 10), limit("Session", used: 20))]
+        let added = MenuBarContentBuilder.includingSession(MenuBarContent(items: []), accounts: accounts)
+        XCTAssertEqual(added.items.map(\.label), ["Session"])
+        XCTAssertEqual(added.items.map(\.value), ["20%"])
+        XCTAssertEqual(MenuBarContentBuilder.includingSession(added, accounts: accounts).items.count, 1)
+    }
+
     func testEveryItemNamesItsLimitAndCarriesItsValue() {
         var dollars = limit("Extra Usage", used: 95, kind: .dollars)
         dollars.displayMode = .remaining

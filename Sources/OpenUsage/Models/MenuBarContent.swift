@@ -42,6 +42,19 @@ enum MenuBarContentBuilder {
         return MenuBarContent(items: shown, overflow: board.attention.count - shown.count)
     }
 
+    static let sessionTitle = "Session"
+
+    /// A session limit always shows: the first account's leads the strip when nothing else put one there.
+    static func includingSession(_ content: MenuBarContent, accounts: [DashboardAccount]) -> MenuBarContent {
+        guard !content.items.contains(where: { $0.label == sessionTitle }) else { return content }
+        for account in accounts {
+            guard let line = account.lines.first(where: { $0.isVisible && $0.data.title == sessionTitle }) else { continue }
+            let item = MenuBarContent.Item(id: line.id, provider: account.provider, label: sessionTitle, shortLabel: sessionTitle, value: line.data.menuBarValue)
+            return MenuBarContent(items: [item] + content.items, overflow: content.overflow, updateAvailable: content.updateAvailable)
+        }
+        return content
+    }
+
     /// The user's own choice of metrics, shown whatever their level. Ones with no reading are left out.
     static func build(accounts: [DashboardAccount], chosen ids: [String]) -> MenuBarContent {
         let lines = accounts.flatMap { account in account.lines.map { (account.provider, $0) } }

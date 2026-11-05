@@ -221,7 +221,10 @@ final class StatusItemController: NSObject {
         let board = PriorityBoard.make(accounts: accounts, burningFast: burningFast, now: now)
         // A chosen metric can have no reading yet, or belong to a removed account: don't go blank over it.
         let picked = MenuBarContentBuilder.build(accounts: accounts, chosen: chosen)
-        let content = picked.isEmpty ? MenuBarContentBuilder.build(board: board, limit: limit) : picked
+        let content = MenuBarContentBuilder.includingSession(
+            picked.isEmpty ? MenuBarContentBuilder.build(board: board, limit: limit) : picked,
+            accounts: accounts
+        )
         stripGate.show(content) { content in
             statusItem.button?.image = MenuBarStripRenderer.image(for: content)
                 ?? MenuBarStripRenderer.appIcon
