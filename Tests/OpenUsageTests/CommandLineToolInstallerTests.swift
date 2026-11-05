@@ -7,7 +7,7 @@ final class CommandLineToolInstallerTests: XCTestCase {
     private func fixture() throws -> (root: URL, source: String, destination: String) {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         let source = root.appendingPathComponent("Brim.app/Contents/Helpers/brim")
-        let destination = root.appendingPathComponent("bin/openusage")
+        let destination = root.appendingPathComponent("bin/brim")
         try FileManager.default.createDirectory(at: source.deletingLastPathComponent(), withIntermediateDirectories: true)
         try Data().write(to: source)
         try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: source.path)
@@ -132,7 +132,7 @@ final class CommandLineToolInstallerTests: XCTestCase {
         XCTAssertTrue(CommandLineToolInstaller.isOpenUsageHelper("/Applications/Brim Beta.app/Contents/Helpers/brim"))
         XCTAssertFalse(CommandLineToolInstaller.isOpenUsageHelper("/Applications/Brim.app/Contents/MacOS/openusage"))
         XCTAssertFalse(CommandLineToolInstaller.isOpenUsageHelper("/Applications/Usage.app/Contents/Helpers/brim"))
-        XCTAssertFalse(CommandLineToolInstaller.isOpenUsageHelper("/opt/homebrew/bin/openusage"))
+        XCTAssertFalse(CommandLineToolInstaller.isOpenUsageHelper("/opt/homebrew/bin/brim"))
         XCTAssertFalse(CommandLineToolInstaller.isOpenUsageHelper("Contents/Helpers/brim"))
     }
 
@@ -166,7 +166,7 @@ final class CommandLineToolInstallerTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: root) }
         let source = root.appendingPathComponent("Brim.app/Contents/Helpers/brim").path
         let other = root.appendingPathComponent("Other Brim.app/Contents/Helpers/brim").path
-        let destination = root.appendingPathComponent("bin/openusage").path
+        let destination = root.appendingPathComponent("bin/brim").path
         try FileManager.default.createDirectory(atPath: (source as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
         try Data().write(to: URL(fileURLWithPath: source))
         func run(_ operation: CommandLineToolInstaller.Operation) throws -> Int32 {

@@ -159,6 +159,13 @@ final class AppContainer {
         }
     }
 
+    /// Picks up a new refresh interval now instead of after the current wait, which can be an hour.
+    func restartRefreshing() {
+        refreshTask?.cancel()
+        refreshTask = nil
+        startRefreshing()
+    }
+
     private func syncAccounts() {
         let previous = providers.map { ObjectIdentifier($0) }
         providers = ProviderCatalog.make(

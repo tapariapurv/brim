@@ -136,7 +136,14 @@ final class WidgetDataStore {
     @discardableResult
     func refresh(providerIDs: [String], force: Bool) async -> [RefreshOutcome] {
         let tasks = providerIDs.map { providerID in
-            Task { await self.refresh(providerID: providerID, force: force, rereadHourly: force) }
+            Task {
+                // Only refresh passes obey the budget: a claim or a new sign-in must read now.
+                if self.snapshots[providerID] != nil, self.providersByID[providerID]?.holdsRead(forced: force) == true {
+                    AppLog.debug(.refresh, "budget hold \(providerID); keeping the last reading")
+                    return RefreshOutcome.cacheHit
+                }
+                return await self.refresh(providerID: providerID, force: force, rereadHourly: force && self.providersByID[providerID]?.rereadsHourlyOnManualRefresh != false)
+            }
         }
         var outcomes: [RefreshOutcome] = []
         outcomes.reserveCapacity(tasks.count)
@@ -158,7 +165,8 @@ final class WidgetDataStore {
         }
         if !force { AppLog.debug(.refresh, "cache miss \(providerID)") }
 
-        if let backoff = backoffs[providerID], backoff.holds(at: now(), forced: force) {
+        if let backoff = backoffs[providerID], backoff.holds(at: now(), forced: force),
+           providersByID[providerID]?.hasLiveLocalData != true {
             AppLog.debug(.refresh, "backoff skip \(providerID) (\(Int(backoff.retryAt.timeIntervalSince(now())))s left)")
             return .backedOff
         }
@@ -326,7 +334,7 @@ final class WidgetDataStore {
         let backoff = backoffs[providerID]
         if let backoff, backoff.providerAsked, date < backoff.retryAt {
             let name = providersByID[providerID]?.provider.displayName ?? "The provider"
-            return "\(name) asked Brim to wait. Retrying at \(Formatters.compactClock(backoff.retryAt, now: date))."
+            return "\(name) paused usage checks. Showing the last reading; next check at \(Formatters.compactClock(backoff.retryAt, now: date))."
         }
         if let snapshot = snapshots[providerID], snapshot.isStale(at: date),
            let duration = Formatters.compactDuration(date.timeIntervalSince(snapshot.refreshedAt)) {

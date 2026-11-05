@@ -17,7 +17,7 @@ enum ProviderError: Error, LocalizedError, Equatable {
         case .connectionFailed: "Connection failed. Check your internet connection and try again."
         case .invalidResponse: "The provider returned an invalid response."
         case .requestFailed(let status): "The provider request failed (HTTP \(status))."
-        case .rateLimited: "The provider asked Brim to wait before asking again."
+        case .rateLimited: "The provider paused usage checks for now."
         case .unavailable(let message): message
         case .keyRejected(let message): "\(message) Replace it on the account's page."
         case .unreachable(let message): message

@@ -16,6 +16,23 @@ final class ClaudeSession {
     var resetGrants = ClaudeResetGrantsState()
     var planRead = SecondaryRead<String>()
     var organizationUUID: String?
+    /// ponytail: in memory, so a relaunch starts a fresh count. Persist it if relaunch loops ever burn the budget.
+    private var reads: [Date] = []
+
+    /// Keeps Brim well inside Anthropic's budget of about 30 an hour, leaving room for Claude Code.
+    static let scheduledSpacing: TimeInterval = 5 * 60
+    static let manualSpacing: TimeInterval = 60
+    static let hourlyBudget = 20
+    /// With the live feed on, the API is only needed for the rows the feed doesn't carry.
+    static let feedTopUpInterval: TimeInterval = 30 * 60
+
+    var lastReadAt: Date? { reads.last }
+
+    func readIsHeld(forced: Bool, at now: Date) -> Bool {
+        reads.removeAll { now.timeIntervalSince($0) >= 3600 }
+        guard let last = reads.last else { return false }
+        return now.timeIntervalSince(last) < (forced ? Self.manualSpacing : Self.scheduledSpacing) || reads.count >= Self.hourlyBudget
+    }
 
     fileprivate init(key: String, sessions: ClaudeSessions) {
         self.key = key
@@ -30,6 +47,7 @@ final class ClaudeSession {
     func send(at now: Date, _ request: @escaping @MainActor () async throws -> HTTPResponse) async throws -> HTTPResponse {
         if let wait = wait(at: now) { throw ProviderError.rateLimited(retryAfter: wait) }
         let window = sessions.windows[key]
+        reads.append(now)
         let response = try await request()
         if response.statusCode == 429 {
             let strikes = (sessions.windows[key]?.strikes ?? 0) + 1
@@ -62,6 +80,8 @@ final class ClaudeSessions {
         windows = defaults?.data(forKey: Self.storageKey)
             .flatMap { try? JSONDecoder().decode([String: ClaudeRateLimitWindow].self, from: $0) } ?? [:]
     }
+
+    var hasOneLogin: Bool { sessions.count == 1 }
 
     func session(for key: String) -> ClaudeSession {
         if let session = sessions[key] { return session }

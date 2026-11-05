@@ -13,6 +13,8 @@ struct SettingsScreen: View {
     @AppStorage(PaceMilestone.closeToRunningOut.settingKey) private var closeToRunningOut = false
     @AppStorage(PaceMilestone.useItOrLoseIt.settingKey) private var useItOrLoseIt = false
     @AppStorage(LogLevelSetting.key) private var logLevel = LogLevelSetting.info
+    @AppStorage(RefreshSetting.key) private var refreshMinutes = RefreshSetting.defaultMinutes
+    @State private var claudeFeed = ClaudeFeedInstaller()
     @State private var launchAtLogin = LaunchAtLoginSetting()
     @State private var commandLineTool = CommandLineToolInstaller()
     @State private var notificationsDenied = false
@@ -42,6 +44,7 @@ struct SettingsScreen: View {
             if screen == .settings {
                 scrollPosition.scrollTo(edge: .top)
                 launchAtLogin.refreshStatus()
+                claudeFeed.refreshStatus()
                 commandLineTool.refreshStatus()
                 if criticalAlert || warningAlert || closeToRunningOut || useItOrLoseIt { checkNotificationPermission() }
             }
@@ -66,6 +69,20 @@ struct SettingsScreen: View {
             }
         }
         .onChange(of: defaultTab) { _, newValue in popover.dashboardTab = newValue }
+        Section("Refresh") {
+            picker(
+                "Refresh Every",
+                selection: $refreshMinutes,
+                options: RefreshSetting.minuteOptions.map { ($0, $0 == 60 ? "1 Hour" : $0 == 1 ? "1 Minute" : "\($0) Minutes") }
+            )
+            Toggle("Claude Code Live Feed", isOn: Binding(
+                get: { claudeFeed.isInstalled },
+                set: { claudeFeed.update(to: $0) }
+            ))
+            SettingsNote("Reads Claude limits from Claude Code with no request to Anthropic, so they can't get blocked. Adds a status line to Claude Code. Use it when one Claude login is added here and Claude Code uses it too. Without it, Claude asks Anthropic at most every 5 minutes.")
+            if let error = claudeFeed.errorMessage { SettingsNote(error, isWarning: true) }
+        }
+        .onChange(of: refreshMinutes) { container.restartRefreshing() }
     }
 
     @ViewBuilder

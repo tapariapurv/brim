@@ -6,6 +6,7 @@ struct ClaudeAccountState {
     var forcedReadsPending = false
     var restoredPlan: String?
     var restoredResets: MetricLine?
+    var lastLines: [MetricLine] = []
 }
 
 extension AccountProviderRuntime {
@@ -17,14 +18,25 @@ extension AccountProviderRuntime {
         let session = claudeSession(for: credential)
         let forced = claude.forcedReadsPending
         claude.forcedReadsPending = false
+        let feed = isCheckingNewSignIn ? nil : claudeFeedLines()
+        if let feed, !forced, session.wait(at: now()) != nil || !claude.lastLines.isEmpty && !claudeTopUpDue(session) {
+            return claudeUsage(session, lines: ClaudeFeed.merge(feed, over: claude.lastLines))
+        }
         if let wait = session.wait(at: now()) { throw ProviderError.rateLimited(retryAfter: wait) }
         let client = ClaudeUsageClient(httpClient: http)
-        let (tokens, response) = try await authorizedRead(credential, grant: ClaudeLogin.refresh) { tokens in
-            let request: @MainActor () async throws -> HTTPResponse = { try await client.fetchUsage(accessToken: tokens.accessToken) }
-            // Cards on one login share a request to save its budget, but a new sign-in must prove itself.
-            return try await isCheckingNewSignIn ? session.send(at: now(), request) : session.usage(at: now(), request)
+        let tokens: OAuthTokens
+        let response: HTTPResponse
+        do {
+            (tokens, response) = try await authorizedRead(credential, grant: ClaudeLogin.refresh) { tokens in
+                let request: @MainActor () async throws -> HTTPResponse = { try await client.fetchUsage(accessToken: tokens.accessToken) }
+                // Cards on one login share a request to save its budget, but a new sign-in must prove itself.
+                return try await isCheckingNewSignIn ? session.send(at: now(), request) : session.usage(at: now(), request)
+            }
+        } catch ProviderError.rateLimited where feed != nil {
+            return claudeUsage(session, lines: ClaudeFeed.merge(feed ?? [], over: claude.lastLines))
         }
-        var lines = try ClaudeUsageMapper.mapUsageResponse(response)
+        let lines = try ClaudeUsageMapper.mapUsageResponse(response)
+        claude.lastLines = lines
         if forced {
             if session.resetGrants.isOlder(than: RefreshSetting.forcedResetGrantsMinimumAge, at: now()) {
                 await readClaudeResetGrants(session, accessToken: tokens.accessToken)
@@ -33,12 +45,37 @@ extension AccountProviderRuntime {
         } else if account.hub != nil, session.planRead.value == nil, session.planRead.isDue(at: now()) {
             try? await readClaudeProfile(session, tokens: tokens)
         }
+        return claudeUsage(session, lines: lines)
+    }
+
+    private func claudeUsage(_ session: ClaudeSession, lines: [MetricLine]) -> ProviderUsage {
+        var lines = lines
         if let resets = claudeResetsLine(session) { lines.append(resets) }
         let plan = session.planRead.value
         return ProviderUsage(plan: plan, lines: lines, lineTitles: ClaudeUsageMapper.lineTitles(plan: plan))
     }
 
+    private func claudeFeedLines() -> [MetricLine]? {
+        guard account.kind == .claude, account.hub == nil, claude.sessions.hasOneLogin else { return nil }
+        return ClaudeFeed.liveLines(now: now())
+    }
+
+    private func claudeTopUpDue(_ session: ClaudeSession) -> Bool {
+        guard let last = session.lastReadAt else { return true }
+        return now().timeIntervalSince(last) >= ClaudeSession.feedTopUpInterval
+    }
+
+    var hasLiveLocalData: Bool { claude.session != nil && claudeFeedLines() != nil }
+
+    var rereadsHourlyOnManualRefresh: Bool { account.kind != .claude }
+
+    func holdsRead(forced: Bool) -> Bool {
+        guard account.kind == .claude, !hasLiveLocalData, let session = claude.session else { return false }
+        return session.readIsHeld(forced: forced, at: now())
+    }
+
     func restoreClaude(_ snapshot: ProviderSnapshot) {
+        claude.lastLines = snapshot.lines.filter { $0.label != ClaudeResetGrantStatus.lineLabel }
         claude.restoredPlan = snapshot.plan
         claude.restoredResets = snapshot.line(label: ClaudeResetGrantStatus.lineLabel)
     }

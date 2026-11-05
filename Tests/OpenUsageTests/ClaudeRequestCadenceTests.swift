@@ -144,7 +144,7 @@ final class ClaudeRequestCadenceTests: XCTestCase {
         let retryAt = Self.start.addingTimeInterval(1800)
         XCTAssertEqual(
             relaunched.stalenessHint(for: account.cardID),
-            "Claude asked Brim to wait. Retrying at \(Formatters.compactClock(retryAt, now: clock.now))."
+            "Claude paused usage checks. Showing the last reading; next check at \(Formatters.compactClock(retryAt, now: clock.now))."
         )
     }
 
@@ -192,7 +192,7 @@ final class ClaudeRequestCadenceTests: XCTestCase {
         XCTAssertEqual(session.wait(at: Self.start), 600, "a success sent before the 429 ended its window")
     }
 
-    func testAForcedRefreshReadsTheGrantsOnlyOnceTheLastCheckIsFifteenMinutesOld() async throws {
+    func testAManualRefreshSendsOnlyTheUsageReadEvenAfterFifteenMinutesOld() async throws {
         let clock = TestClock(Self.start)
         let http = Self.anthropic()
         let runtime = try makeRuntime(http: http, clock: clock)
@@ -202,11 +202,11 @@ final class ClaudeRequestCadenceTests: XCTestCase {
 
         clock.set(Self.start.addingTimeInterval(5 * 60))
         await store.refreshAll(force: true)
-        XCTAssertEqual(kinds(http), ["usage", "profile", "grants", "usage", "profile"])
+        XCTAssertEqual(kinds(http), ["usage", "profile", "grants", "usage"])
 
         clock.set(Self.start.addingTimeInterval(RefreshSetting.forcedResetGrantsMinimumAge))
         await store.refreshAll(force: true)
-        XCTAssertEqual(kinds(http).suffix(3), ["usage", "grants", "profile"])
+        XCTAssertEqual(kinds(http).suffix(2), ["usage", "usage"])
     }
 
     func testAClaimRefreshesTheMetersAtOnceWithoutAGrantsRead() async throws {

@@ -19,7 +19,7 @@ final class RefreshBackoffTests: XCTestCase {
         XCTAssertNil(store.errorMessage(for: "test"), "a provider-set wait is the clock glyph, not the warning")
         XCTAssertEqual(
             store.stalenessHint(for: "test"),
-            "Claude asked Brim to wait. Retrying at \(Formatters.compactClock(retryAt, now: clock.now))."
+            "Claude paused usage checks. Showing the last reading; next check at \(Formatters.compactClock(retryAt, now: clock.now))."
         )
         XCTAssertEqual(store.data(for: descriptor).used, 12, "the last good numbers stay on screen")
 

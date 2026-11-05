@@ -85,7 +85,7 @@ final class CommandLineToolInstaller {
     /// Every OpenUsage installer, main's included, links the command to `<OpenUsage….app>/Contents/Helpers/brim`.
     static func isOpenUsageHelper(_ path: String) -> Bool {
         let components = (path as NSString).pathComponents
-        guard components.count >= 4, Array(components.suffix(3)) == ["Contents", "Helpers", "openusage"] else { return false }
+        guard components.count >= 4, Array(components.suffix(3)) == ["Contents", "Helpers", "brim"] else { return false }
         let bundle = components[components.count - 4]
         return bundle.hasPrefix("Brim") && bundle.hasSuffix(".app")
     }
