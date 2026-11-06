@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Brim</title>
+        <item>
+            <title>0.2.0</title>
+            <pubDate>Fri, 06 Nov 2026 10:05:21 +0530</pubDate>
+            <sparkle:version>841</sparkle:version>
+            <sparkle:shortVersionString>0.2.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <enclosure url="https://github.com/tapariapurv/brim/releases/download/v0.2.0/Brim-0.2.0.dmg" length="8895934" type="application/octet-stream" sparkle:edSignature="VxnSbsONNx4mbKTzD8Pmx7ngROby/QmGrKMLnBC1BeUE0vDFPlgnEgbq7Df/RJZnlmslvd9mTFA4rUEAh56SAA=="/>
+        </item>
+    </channel>
+</rss>
