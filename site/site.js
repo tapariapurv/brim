@@ -103,6 +103,26 @@ checks.forEach((check) => check.addEventListener("click", () => {
   });
 }));
 
+// Film: once started, it docks to the corner whenever its place on the page scrolls away.
+const film = $("#film-video");
+const player = $("#film-player");
+let filmAway = false;
+const dockFilm = () => player.classList.toggle("docked", filmAway && (!film.paused || player.classList.contains("docked")));
+new IntersectionObserver(([entry]) => {
+  filmAway = !entry.isIntersecting;
+  dockFilm();
+}, { threshold: 0.35 }).observe($("#film-frame"));
+film.addEventListener("play", () => {
+  player.classList.add("started");
+  dockFilm();
+});
+film.addEventListener("ended", () => player.classList.remove("docked"));
+$("#film-play").addEventListener("click", () => film.play());
+$("#film-close").addEventListener("click", () => {
+  film.pause();
+  player.classList.remove("docked");
+});
+
 // Scroll-linked: the nav's hairline, the install line, and the last section filling to the brim.
 const clamp = (v) => Math.min(1, Math.max(0, v));
 const progress = $("#progress");

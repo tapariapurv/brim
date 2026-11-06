@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<title>Brim: Know your limits</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<script src="assets/cues.js"></script>
+<style>
+@font-face{font-family:Roundo;font-weight:400;src:url(assets/roundo-400.woff2)}
+@font-face{font-family:Roundo;font-weight:500;src:url(assets/roundo-500.woff2)}
+@font-face{font-family:Roundo;font-weight:600;src:url(assets/roundo-600.woff2)}
+:root{--ink:#04191d;--text:#eafaf8;--soft:#93b0b1;--teal:#4fd8d4;--deep:#0b8f97;--hot:#ef4f4a;--blue:#3b82f6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--text);font-family:Roundo,system-ui,sans-serif}
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--ink)}
+#gl{position:absolute;inset:0;width:1920px;height:1080px}
+.scene{position:absolute;inset:0;opacity:0}
+.cam{position:absolute;inset:0}
+.h{font-weight:600;letter-spacing:-.025em;line-height:1.06}
+.mask{display:inline-block;overflow:hidden;vertical-align:top;padding:.06em .02em .14em;margin:-.06em -.02em -.14em}
+.mask>span{display:inline-block}
+.center{position:absolute;left:0;right:0;text-align:center}
+.ico{display:block;background:currentColor;-webkit-mask:var(--i) center/contain no-repeat;mask:var(--i) center/contain no-repeat}
+
+/* terminal */
+.term{position:absolute;left:340px;top:190px;width:1240px;height:700px;border-radius:22px;background:rgba(7,32,36,.92);border:1px solid rgba(214,245,243,.13);box-shadow:0 50px 120px rgba(0,0,0,.5);font:400 27px/1.72 ui-monospace,Menlo,monospace;color:#cfe6e4;overflow:hidden}
+.term .bar{height:56px;display:flex;align-items:center;gap:10px;padding:0 22px;border-bottom:1px solid rgba(214,245,243,.09);color:var(--soft);font-size:20px}
+.term i{width:14px;height:14px;border-radius:50%;background:rgba(214,245,243,.2)}
+.term .bar b{font-weight:400;margin-left:14px}
+.term .body{padding:26px 36px}
+.tl{opacity:0;white-space:pre}
+.tl em{font-style:normal;color:var(--teal)}
+.tl u{text-decoration:none;color:var(--soft)}
+#caret{display:inline-block;width:14px;height:30px;background:var(--teal);vertical-align:-6px;margin-left:3px}
+#limit{margin-top:14px;padding:10px 20px;border-radius:12px;background:rgba(239,79,74,.16);color:#ff8e88;border:1px solid rgba(239,79,74,.55);opacity:0;white-space:pre}
+#flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 55%,rgba(239,79,74,.5),transparent 70%);opacity:0}
+
+/* menu bar */
+#mbar{position:absolute;left:0;top:0;width:1920px;height:38px;background:rgba(255,255,255,.14);backdrop-filter:blur(30px);display:flex;align-items:center;padding:0 18px;gap:26px;font:500 18px system-ui;color:#fff}
+#mbar b{font-weight:700}
+#mbar .sp{flex:1}
+#item{display:flex;align-items:center;gap:7px;font:600 18px system-ui;font-variant-numeric:tabular-nums;padding:2px 8px;border-radius:7px;width:88px}
+#item .ico{width:18px;height:18px;flex:none}
+
+/* panel: real metrics from the app at 340pt wide, shown at 1.35x */
+#panel,.pclone{position:absolute;left:1270px;top:48px;width:340px;height:708px;transform:scale(1.35);transform-origin:0 0;border-radius:24px;background:#f6f4f1;color:#1d1b19;overflow:hidden;box-shadow:0 30px 70px rgba(0,20,24,.45),0 0 0 .5px rgba(0,0,0,.15);font:500 13px system-ui;font-variant-numeric:tabular-nums}
+.pfill{position:absolute;left:0;bottom:0;width:340px;height:708px}
+.tabs{position:absolute;left:12px;top:12px;width:316px;height:36px;border-radius:18px;background:#eeeeee;display:flex}
+.tabs span{flex:1;text-align:center;line-height:36px;font-size:13.5px;color:#8b8b8b;position:relative;z-index:1}
+.tabs .on{color:#111;font-weight:600}
+.tabs .pill{position:absolute;top:2px;bottom:2px;width:156px;left:2px;background:#fff;border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.pall{position:absolute;left:0;top:50px;width:340px}
+.prov{padding:10px 12px 0}
+.prov h4{margin:0 0 8px 12px;font:650 15.5px system-ui;display:flex;justify-content:space-between;padding-right:12px;align-items:center}
+.prov h4 .ico{width:17px;height:17px;color:#55504b}
+.gcard{background:rgba(120,105,90,.07);border:.5px solid rgba(90,80,70,.12);border-radius:12px;padding:6px 12px 3px}
+.grow{display:flex;align-items:center;height:22px;font-size:12.5px;color:#1d1b19;white-space:nowrap}
+.grow.acc{color:#6d6862;font-weight:600;font-size:11.5px;justify-content:space-between}
+.grow.acc span:last-child{background:rgba(90,80,70,.13);padding:0 6px;border-radius:5px;font-size:10px}
+.grow>.l{width:102px}
+.track{position:relative;width:66px;height:7px;border-radius:4px;background:rgba(90,80,70,.2);margin-right:9px;flex:none}
+.track .f{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--blue);width:0}
+.track .t{position:absolute;top:-3px;width:1.6px;height:13px;background:rgba(60,55,50,.72);border-radius:1px}
+.grow .pct{width:38px;text-align:right;color:#6d6862}
+.grow .rs{flex:1;text-align:right;color:#6d6862;font-size:11.5px}
+.grow .val{flex:1;text-align:right;font-weight:550}
+.grow .val small{font-size:12.5px;color:#6d6862;font-weight:500}
+.pfoot{position:absolute;left:0;right:0;bottom:0;height:54px;padding:10px 16px;font-size:11.5px;line-height:16px;color:#6d6862;background:rgba(246,244,241,.0)}
+.pbtn{position:absolute;right:14px;bottom:10px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.8);box-shadow:0 1px 3px rgba(0,0,0,.2);text-align:center;line-height:30px;font-weight:800;color:#111;letter-spacing:.5px}
+.ppri{position:absolute;left:0;top:50px;width:340px;padding:8px 16px;opacity:0}
+.ppri .lab{color:#6d6862;font-weight:600;font-size:12.5px;margin:4px 0 8px}
+.ppri .rr{display:flex;align-items:center;gap:11px;height:42px}
+.ppri .nm{flex:1;font-size:14px;font-weight:600}
+.ppri .nm small{display:block;font-size:11px;color:#6d6862;font-weight:500}
+.ppri .rt{text-align:right;font-weight:650;font-size:13.5px}
+.ppri .rt small{display:block;font-size:11px;color:#6d6862;font-weight:500}
+.fix{background:rgba(90,80,70,.14);border-radius:7px;padding:3px 10px;font-size:12px;font-weight:550}
+#ringS{position:relative;width:38px;height:38px}
+#ringS .ico{position:absolute;left:10px;top:10px;width:18px;height:18px;color:#55504b}
+#cursor{position:absolute;left:0;top:0;width:38px;height:auto;z-index:30;opacity:0;filter:drop-shadow(0 3px 5px rgba(0,0,0,.4))}
+
+/* copy */
+.copy{position:absolute;left:130px;font-size:112px;opacity:0}
+.copy .sub{font-size:40px;font-weight:500;letter-spacing:-.01em;color:rgba(234,250,248,.75);margin-top:30px;line-height:1.25}
+#callA,#callB{position:absolute;left:50%;white-space:nowrap;font-size:56px;top:590px;opacity:0;padding:18px 44px 22px;border-radius:26px;background:rgba(4,25,29,.93);color:#fff}
+#leader{position:absolute;width:3px;background:#fff;opacity:0;transform-origin:top;border-radius:2px}
+
+/* providers */
+.bub{position:absolute;width:158px;height:158px;border-radius:50%;background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.42),rgba(255,255,255,.07) 45%,rgba(255,255,255,.14) 78%,rgba(255,255,255,.36));box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.34),0 18px 40px rgba(0,40,50,.22);display:grid;place-items:center;color:#fff}
+.bub .ico{width:72px;height:72px}
+.bub b{position:absolute;top:172px;left:-40px;right:-40px;text-align:center;font:500 26px Roundo}
+
+/* cost */
+#cost{font-size:320px;letter-spacing:-.04em;font-weight:600;font-variant-numeric:tabular-nums;top:250px}
+#costS{top:600px;font-size:54px;font-weight:500}
+#costR{top:690px;font-size:38px;font-weight:500;color:rgba(234,250,248,.72)}
+#costN{top:958px;font-size:28px;color:#fff;font-weight:500;text-shadow:0 1px 14px rgba(0,50,60,.75)}
+
+/* backgrounds */
+.bgs{position:absolute;left:210px;top:190px;font-size:130px;line-height:1.26}
+.bgs div{opacity:.25}
+.pclone{left:1060px;top:66px;transform:scale(1.34)}
+.bgfx{position:absolute;inset:0;opacity:0}
+
+/* raycast, recreated from the extension's real layout */
+.key{display:inline-block;width:120px;height:120px;border-radius:24px;background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 2px rgba(255,255,255,.3),0 8px 0 rgba(0,0,0,.2);font:600 66px/118px Roundo;text-align:center;margin-right:16px;opacity:0;color:#fff}
+#ray{position:absolute;left:800px;top:190px;width:1000px;height:700px;border-radius:30px;background:linear-gradient(170deg,#ebe5da,#f0dcd0);color:#2c1d33;box-shadow:0 50px 110px rgba(0,20,24,.5);font:500 29px system-ui;font-variant-numeric:tabular-nums;opacity:0;overflow:hidden}
+#ray .srch{height:82px;padding:28px 34px;font-size:26px;color:#6d6068;border-bottom:1px solid rgba(60,30,50,.1)}
+#ray .ll{position:absolute;left:14px;top:96px;width:420px}
+#ray .ll div{display:flex;justify-content:space-between;padding:22px 20px;border-radius:14px;margin-bottom:6px}
+#ray .ll div:first-child{background:rgba(110,60,120,.13)}
+#ray .ll span:last-child{color:#65555f}
+#ray .rr2{position:absolute;left:440px;top:96px;right:24px;font-size:24px}
+#ray .rr2 div{display:flex;justify-content:space-between;padding:26px 14px;border-radius:8px}
+#ray .rr2 div:nth-child(odd){background:rgba(90,60,40,.06)}
+#ray .rr2 span:first-child{color:#6d6068}
+#ray .bad{background:rgba(239,79,74,.2);color:#b92c28;padding:0 9px;border-radius:6px}
+#ray .goo{background:rgba(52,211,153,.25);color:#167a55;padding:0 9px;border-radius:6px}
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="44.4" data-width="1920" data-height="1080">
+  <canvas id="gl" width="1280" height="720"></canvas>
+
+  <!-- 1 terminal: the pain -->
+  <div class="scene" id="s1"><div class="cam" id="c1">
+    <div class="term" id="term1">
+      <div class="bar"><i></i><i></i><i></i><b>~/app  claude</b></div>
+      <div class="body">
+        <div style="white-space:pre"><em style="font-style:normal;color:var(--teal)">&gt; </em><span id="ptxt"></span><span id="caret"></span></div>
+        <div class="tl"><em>⏺</em> Read src/auth/session.ts</div>
+        <div class="tl"><em>⏺</em> Update src/auth/session.ts <u>+84 −31</u></div>
+        <div class="tl"><em>⏺</em> Read src/auth/tokens.ts</div>
+        <div class="tl"><em>⏺</em> Update src/auth/tokens.ts <u>+41 −12</u></div>
+        <div class="tl"><em>⏺</em> Write tests/session.test.ts <u>+126</u></div>
+        <div class="tl"><em>⏺</em> Run npm test</div>
+        <div class="tl"><u>  11 of 14 passing, fixing the last 3</u></div>
+        <div id="limit">Session limit reached. Resets 12:10 PM.</div>
+      </div>
+    </div>
+  </div><div id="flash"></div></div>
+  <div class="scene center h" id="s1b" style="top:430px;font-size:136px"><span class="mask"><span>Mid-flow.</span></span> <span class="mask"><span>No warning.</span></span></div>
+  <svg id="drop" width="70" height="104" viewBox="0 0 70 104" style="position:absolute;left:925px;top:0;opacity:0"><path d="M35 2C35 2 66 52 66 70a31 31 0 0 1-62 0C4 52 35 2 35 2z" fill="#4fd8d4"/><ellipse cx="24" cy="70" rx="7" ry="12" fill="#c8f6f4" opacity=".75"/></svg>
+
+  <!-- 2 logo -->
+  <div class="scene" id="s2">
+    <svg id="mark" viewBox="0 0 1024 1024" width="520" height="520" style="position:absolute;left:700px;top:280px;overflow:visible">
+      <defs><clipPath id="lc"><circle cx="512" cy="530" r="208"/></clipPath></defs>
+      <circle id="ringP" cx="512" cy="512" r="304" fill="none" stroke="#fff" stroke-width="72"/>
+      <g clip-path="url(#lc)"><path id="liq" fill="#fff"/></g>
+    </svg>
+    <div class="h" id="word" style="position:absolute;left:880px;top:366px;font-size:250px;letter-spacing:-.035em"><span class="mask"><span>Brim</span></span></div>
+    <div class="center" id="tag" style="top:716px;font-size:58px;font-weight:500;color:rgba(234,250,248,.82)">Know your limits.</div>
+  </div>
+
+  <!-- 3-5 menu bar + panel -->
+  <div class="scene" id="s3"><div class="cam" id="c3">
+    <div id="mbar"><span style="font-size:21px"></span><b>Code</b><span>File</span><span>Edit</span><span>View</span><span>Window</span><span>Help</span><span class="sp"></span>
+      <div id="item"><span class="ico" style="--i:url(icons/x)" id="itemI"></span><span id="itemP">0%</span></div>
+      <svg width="24" height="18" viewBox="0 0 24 18" style="margin-left:220px"><path fill="#fff" d="M12 16.5 8.8 12.8a5 5 0 0 1 6.4 0zM5.9 9.6a9.4 9.4 0 0 1 12.2 0l1.9-2.2a12.3 12.3 0 0 0-16 0zM1 4.4a16 16 0 0 1 22 0L21 2.2a19 19 0 0 0-18 0z"/></svg>
+      <span>Fri 11:42 AM</span></div>
+    <div id="panel">
+      <svg class="pfill" id="pw" viewBox="0 0 340 708"><path id="pw2" fill="#e6d5c3" opacity=".55"/><path id="pw1" fill="#e2d7cc"/></svg>
+      <div class="pall" id="pall"></div>
+      <div class="ppri" id="ppri">
+        <div class="lab">Running Out</div>
+        <div class="rr"><div id="ringS"><svg width="38" height="38" viewBox="0 0 38 38" style="transform:rotate(-90deg)"><circle cx="19" cy="19" r="16.5" fill="none" stroke="rgba(90,80,70,.18)" stroke-width="3.6"/><circle id="ring" cx="19" cy="19" r="16.5" fill="none" stroke="#ef4f4a" stroke-width="3.6" stroke-linecap="round" pathLength="100" stroke-dasharray="0 100"/></svg><span class="ico" id="ringI"></span></div>
+          <div class="nm">Session<small>you@brim.app</small></div><div class="rt"><span id="ringN">0</span>% used<small>12:10 PM</small></div></div>
+        <div class="lab" style="margin-top:18px">Needs Attention ⚠️</div>
+        <div class="rr" style="height:34px"><span class="ico" id="ocI" style="width:18px;height:18px;color:#55504b"></span><div class="nm">OpenCode <span style="font-weight:500;color:#6d6862;font-size:12px">Local</span></div><span class="fix">Fix</span></div>
+      </div>
+      <div class="tabs"><i class="pill" id="tpill"></i><span id="tP">Priority</span><span id="tA" class="on">All Usage</span></div>
+      <div class="pfoot">Brim 0.2.0<br>Next update in 4m</div><div class="pbtn">···</div>
+    </div>
+  </div>
+  <div class="copy h" id="cp1" style="top:220px"><span class="mask"><span>Every limit.</span></span><br><span class="mask"><span>One glance.</span></span><div class="sub">Right in your Mac menu bar.</div></div>
+  <div class="copy h" id="cp2" style="top:640px;font-size:96px"><span class="mask"><span>Only what</span></span><br><span class="mask"><span>needs you.</span></span></div>
+  <svg id="cursor" viewBox="0 0 28 36"><path d="M3 2v26l7-6.5 4.6 11 4.6-2-4.6-10.6H24z" fill="#111" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/></svg>
+  <div id="leader"></div>
+  <div class="h" id="callA">85% gone, with hours to go.</div>
+  <div class="h" id="callB">The mark shows where you should be.</div>
+  </div>
+
+  <!-- 6 providers -->
+  <div class="scene" id="s6"><div class="center h" id="pvH" style="top:170px;font-size:84px"><span class="mask"><span>Claude, Codex, Cursor</span></span> <span class="mask"><span>and nine more.</span></span></div><div id="bubs"></div></div>
+
+  <!-- 7 cost -->
+  <div class="scene" id="s7">
+    <div class="center h" id="cost">$0.00</div>
+    <div class="center" id="costS">est. today, across 45.1M tokens</div>
+    <div class="center" id="costR">Yesterday $10.60   ·   Last 30 days $750.61</div>
+    <div class="center" id="costN">From your local logs, at public API rates. What the same tokens would cost, not what your plan costs.</div>
+  </div>
+
+  <!-- 8 backgrounds -->
+  <div class="scene" id="s8">
+    <div class="bgs h"><div id="b0">Liquid</div><div id="b1">Aurora</div><div id="b2">Sunset</div></div>
+    <div id="pcHost"></div>
+  </div>
+
+  <!-- 9 privacy -->
+  <div class="scene center h" id="s9" style="top:0;bottom:0;font-size:190px;display:grid;place-items:center">
+    <div style="grid-area:1/1" id="pv0">No sign-in needed.</div><div style="grid-area:1/1" id="pv1">No analytics.</div><div style="grid-area:1/1" id="pv2">Free.</div>
+  </div>
+
+  <!-- 10 raycast -->
+  <div class="scene" id="s10">
+    <div class="h" id="rcT" style="position:absolute;left:130px;top:360px;font-size:92px"><span class="mask"><span>Also in</span></span><br><span class="mask"><span>Raycast.</span></span></div>
+    <div style="position:absolute;left:130px;top:600px"><span class="key" id="k0">c</span><span class="key" id="k1">c</span></div>
+    <div id="ray"><div class="srch">Search...</div>
+      <div class="ll"><div><span>Usage Limits</span><span>85%</span></div><div><span>Today</span><span>$30.85</span></div><div><span>Yesterday</span><span>$10.60</span></div><div><span>This Month</span><span>$750.61</span></div><div><span>Sessions</span><span>5 sessions</span></div><div><span>Models</span><span>5 models</span></div></div>
+      <div class="rr2"><div><span>5-Hour Limit</span><span>85% Used</span></div><div><span>Resets By</span><span>12:10 PM</span></div><div><span>On Pace For</span><span class="bad">115%</span></div><div><span>7-Day Limit</span><span>29% Used</span></div><div><span>Resets By</span><span>Mon 3:00 PM</span></div><div><span>On Pace For</span><span class="goo">52%</span></div><div><span>Updated</span><span>Just now</span></div></div>
+    </div>
+  </div>
+
+  <!-- 11 flow restored -->
+  <div class="scene" id="s11">
+    <div class="center h" id="flH" style="top:96px;font-size:92px"><span class="mask"><span>See it coming.</span></span> <span class="mask"><span>Stay in flow.</span></span></div>
+    <div class="term" id="term2" style="top:290px;height:470px;font-size:31px">
+      <div class="bar"><i></i><i></i><i></i><b>~/app  claude</b><span style="flex:1"></span><span class="ico" id="trI" style="width:20px;height:20px;color:#fff"></span><span style="color:#fff">87%</span></div>
+      <div class="body">
+        <div><span style="color:var(--teal)">&gt; </span>refactor the auth flow and add tests</div>
+        <div><em style="font-style:normal;color:var(--teal)">⏺</em> Update src/auth/tokens.ts <span style="color:var(--soft)">+41 −12</span></div>
+        <div><em style="font-style:normal;color:var(--teal)">⏺</em> Run npm test</div>
+        <div class="ok2" style="opacity:0;color:#34d399">✓ 14 of 14 passing</div>
+        <div class="ok2" style="opacity:0"><em style="font-style:normal;color:var(--teal)">⏺</em> Committed. Session at 87%, resets 12:10 PM.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12 end card -->
+  <div class="scene" id="s12">
+    <svg id="mark2" viewBox="0 0 1024 1024" width="260" height="260" style="position:absolute;left:544px;top:300px;overflow:visible"><circle cx="512" cy="512" r="304" fill="none" stroke="#fff" stroke-width="72"/><path fill="#fff" d="M304 530c70-54 140-54 208 0s138 54 208 0a208 208 0 0 1-416 0z"/></svg>
+    <div class="h" id="endW" style="position:absolute;left:814px;top:300px;font-size:240px;letter-spacing:-.035em"><span class="mask"><span>Brim</span></span></div>
+    <div class="center h" id="endT" style="top:600px;font-size:84px">Know your limits.</div>
+    <div class="center" id="endC" style="top:730px;font-size:38px;font-weight:500;color:rgba(255,255,255,.88)">Free for Mac. Needs macOS 26.</div>
+    <div class="center" id="endU" style="top:796px;font-size:32px;font-weight:400;color:rgba(255,255,255,.72)">tapariapurv.github.io/brim</div>
+  </div>
+</div>
+
+<script>
+window.__timelines = window.__timelines || {};
+document.fonts.ready.then(() => {
+const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const smooth = (x) => x * x * (3 - 2 * x);
+const kf = (k, t) => { for (let i = 1; i < k.length; i++) if (t <= k[i][0]) { const [a, va] = k[i - 1], [b, vb] = k[i]; return va + (vb - va) * smooth((t - a) / (b - a || 1)); } return k[k.length - 1][1]; };
+const eo = (x) => 1 - Math.pow(1 - x, 4);
+const ramp = (t, a, b) => eo(clamp((t - a) / (b - a)));
+const icon = (n) => `url(assets/icons/${n}.svg)`;
+const setI = (q, n) => { const e = $(q); e.classList.add("ico"); e.style.setProperty("--i", icon(n)); };
+["#itemI:claude", "#ringI:claude", "#ocI:opencode", "#trI:claude"].forEach((s) => { const [q, n] = s.split(":"); setI(q, n); });
+
+/* ---------- panel rows: real values read from the running app, emails anonymised ---------- */
+const meter = (l, p, tk, r, id) => `<div class="grow r"><span class="l">${l}</span><span class="track"><span class="f" data-p="${p}" ${id ? `id="${id}"` : ""}></span>${tk != null ? `<span class="t" ${id ? `id="${id}T"` : ""} style="left:${tk}%"></span>` : ""}</span><span class="pct" ${id ? `id="${id}N"` : ""}>${p}%</span><span class="rs">${r}</span></div>`;
+const val = (l, v, s) => `<div class="grow r"><span class="l" style="width:auto">${l}</span><span class="val">${v}${s ? ` <small>· ${s}</small>` : ""}</span></div>`;
+const prov = (n, ic, acc, plan, rows) => `<div class="prov r"><h4>${n}<span class="ico" style="--i:${icon(ic)}"></span></h4><div class="gcard"><div class="grow acc"><span>${acc}</span><span>${plan}</span></div>${rows}</div></div>`;
+$("#pall").innerHTML =
+  prov("Claude", "claude", "you@brim.app", "Pro", meter("Session", 85, 70, "12:10 PM", "sess") + meter("Weekly", 29, 54, "Mon 3 PM") + val("Today", "$30.85 est.", "45.1M tokens") + val("Yesterday", "$10.60 est.", "22.8M tokens") + val("Last 30 Days", "$750.61 est.", "1.8B tokens")) +
+  prov("ChatGPT", "codex", "you@brim.app", "Go", meter("Session", 11, 16, "Nov 30") + val("Limit Resets", "2 available") + val("Today", "0 tokens") + val("Yesterday", "0 tokens") + val("Last 30 Days", "23.9M tokens")) +
+  prov("Antigravity", "antigravity", "you@brim.app", "Google AI Pro", meter("Gemini 5h", 0, null, "") + meter("Gemini", 0, null, "Nov 13") + meter("Claude 5h", 0, null, "") + meter("Claude", 0, null, "Nov 13"));
+$$(".track .f").forEach((f) => { const p = +f.dataset.p; f.style.background = p >= 80 ? "var(--hot)" : "var(--blue)"; });
+
+/* background-swap clone */
+const pc = $("#panel").cloneNode(true); pc.removeAttribute("id"); pc.className = "pclone"; pc.querySelectorAll("[id]").forEach((e) => e.removeAttribute("id"));
+pc.querySelectorAll(".f").forEach((f) => (f.style.width = f.dataset.p + "%"));
+pc.querySelector(".ppri").remove();
+pc.insertAdjacentHTML("afterbegin", `<div class="bgfx" id="fxA" style="background:radial-gradient(60% 40% at 25% 75%,rgba(70,220,170,.6),transparent),radial-gradient(60% 40% at 75% 60%,rgba(110,90,230,.5),transparent),radial-gradient(50% 30% at 50% 95%,rgba(60,160,240,.5),transparent)"></div><div class="bgfx" id="fxS" style="background:linear-gradient(0deg,rgba(255,150,70,.65),rgba(245,90,120,.42) 40%,rgba(120,70,190,.28) 70%,transparent)"></div>`);
+$("#pcHost").appendChild(pc);
+const pcF = pc.querySelector(".pfill");
+
+/* providers */
+const PV = [["claude","Claude"],["codex","Codex"],["cursor","Cursor"],["antigravity","Antigravity"],["copilot","Copilot"],["devin","Devin"],["grok","Grok"],["muse","Muse Code"],["ollama","Ollama"],["opencode","OpenCode"],["openrouter","OpenRouter"],["zai","Z.ai"]];
+const GX = 270, GY = 262;
+$("#bubs").innerHTML = PV.map(([i, n], k) => `<div class="bub" style="left:${960 - 79 + (k % 6 - 2.5) * GX}px;top:${390 + Math.floor(k / 6) * GY}px"><span class="ico" style="--i:${icon(i)}"></span><b>${n}</b></div>`).join("");
+const bubs = $$(".bub");
+
+/* ---------- WebGL liquid: one continuous body of water for the whole film ---------- */
+const gl = $("#gl").getContext("webgl", { preserveDrawingBuffer: true, antialias: false, alpha: false });
+const VS = "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
+const FS = `precision highp float;uniform vec2 R;uniform float T,L,A,S,H,I,J;
+float wv(float x,float p,float a){return a*(sin(x*2.1+p)*.6+sin(x*4.7-p*1.3+1.)*.27+sin(x*9.3+p*2.1)*.09);}
+float hash(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}
+float caust(vec2 p,float t){vec2 q=mod(p*5.2,6.28318)-250.;vec2 i=q;float c=1.;for(int n=0;n<4;n++){float tt=t*(1.-3.5/float(n+1));i=q+vec2(cos(tt-i.x)+sin(tt+i.y),sin(tt-i.y)+cos(tt+i.x));c+=1./length(vec2(q.x/(sin(i.x+tt)/.005),q.y/(cos(i.y+tt)/.005)));}c/=4.;c=1.17-pow(c,1.4);return pow(abs(c),8.);}
+vec3 ramp(float d,vec3 a,vec3 b,vec3 c){return mix(mix(a,b,smoothstep(0.,.2,d)),c,smoothstep(.12,.95,d));}
+float ring(float r,float age){return exp(-pow((r-age*.62)*34.,2.))*exp(-age*1.9)*step(0.,age);}
+void main(){vec2 uv=gl_FragCoord.xy/R;float ar=R.x/R.y;vec2 p=vec2(uv.x*ar,uv.y);
+ float amp=mix(1.,.55,smoothstep(.8,1.,L))*smoothstep(0.,.05,L);
+ float s0=L+wv(p.x,T*.62,.02*amp),s1=L+.012+wv(p.x,-T*.46+2.,.024*amp),s2=L+.026+wv(p.x+1.,T*.33+4.,.026*amp);
+ if(L<.0005){s0=-1.;s1=-1.;s2=-1.;}
+ vec3 ink=mix(vec3(.012,.082,.098),vec3(.022,.118,.132),uv.y);
+ ink+=vec3(.018,.07,.075)*exp(-3.*length(p-vec2(.5*ar,.42)));
+ vec3 a=vec3(.31,.85,.83),b=vec3(.043,.56,.59),c=vec3(.016,.15,.18);
+ a=mix(a,vec3(1.,.74,.44),H);b=mix(b,vec3(.86,.43,.2),H);c=mix(c,vec3(.24,.1,.06),H);
+ a=mix(a,vec3(.47,.96,.74),A);b=mix(b,vec3(.2,.42,.88),A);c=mix(c,vec3(.13,.07,.35),A);
+ a=mix(a,vec3(1.,.82,.46),S);b=mix(b,vec3(.94,.33,.37),S);c=mix(c,vec3(.25,.1,.44),S);
+ float d=s0-uv.y;vec3 w=ramp(max(d,0.),a,b,c);
+ float ca=caust(p+vec2(0.,d*.25),T*.42);
+ w+=mix(a,vec3(1.),.45)*ca*(.5*exp(-d*1.6)+.1);
+ float rays=(sin(p.x*9.+T*.3+d*5.)+sin(p.x*17.-T*.2-d*3.)+sin(p.x*5.-T*.14))/3.;
+ w+=a*max(rays,0.)*exp(-d*4.2)*.2;
+ vec2 g=p*vec2(9.,5.);g.y-=T*.34;vec2 id=floor(g);vec2 f=fract(g)-.5;float h=hash(id);vec2 o=vec2(hash(id+3.)-.5,hash(id+7.)-.5)*.6;float bub=smoothstep(.05,.0,abs(length(f-o)-(.02+h*.03)))*step(.83,h);
+ w+=vec3(.9)*bub*.35*smoothstep(0.,.08,d);
+ vec3 col=ink;
+ col=mix(col,mix(ink,b,.45),smoothstep(0.003,-.003,uv.y-s2)*.55);
+ col=mix(col,mix(ink,a,.5),smoothstep(0.003,-.003,uv.y-s1)*.6);
+ col=mix(col,w,smoothstep(.0022,-.0022,uv.y-s0));
+ if(L>.0005){col+=mix(a,vec3(1.),.65)*exp(-abs(d)*240.)*.85;col+=a*exp(-max(-d,0.)*22.)*step(d,0.)*.14;}
+ vec2 ic=vec2(.5*ar,.5);float r=length(p-ic);float rg=ring(r,I)+ring(r,I-.16)*.55+ring(r,I-.34)*.3;
+ col+=vec3(.31,.85,.83)*rg*.8;
+ vec2 jc=vec2(.5*ar,.885);float rj=length((p-jc)*vec2(1.,3.4));col+=vec3(1.)*(ring(rj,J)+ring(rj,J-.2)*.5)*.5;
+ col*=1.-.32*pow(length(uv-.5)*1.25,2.6);
+ col+=(hash(gl_FragCoord.xy+fract(T)*91.)-.5)*.022;
+ gl_FragColor=vec4(col,1.);}`;
+const sh = (ty, src) => { const s = gl.createShader(ty); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s)); return s; };
+const pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(pr); gl.useProgram(pr);
+gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer()); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,3,-1,-1,3]), gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0); gl.bindAttribLocation(pr, 0, "a"); gl.linkProgram(pr); gl.useProgram(pr); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+const U = {}; "R T L A S H I J".split(" ").forEach((n) => (U[n] = gl.getUniformLocation(pr, n)));
+gl.uniform2f(U.R, 1280, 720);
+const drawGL = (t) => {
+  gl.uniform1f(U.T, t + 40); gl.uniform1f(U.L, kf(C.level, t)); gl.uniform1f(U.H, kf(C.heat, t)); gl.uniform1f(U.A, kf(C.aurora, t)); gl.uniform1f(U.S, kf(C.sunset, t));
+  gl.uniform1f(U.I, t < C.impact ? -1 : t - C.impact); gl.uniform1f(U.J, t < C.impact2 ? -1 : t - C.impact2);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+};
+
+/* ---------- pure functions of time ---------- */
+const wavePath = (y, a, ph, w = 340, h = 708) => { let s = `M0 ${h}L0 ${y + a * Math.sin(ph)}`; for (let x = 8; x <= w; x += 8) s += `L${x} ${(y + a * Math.sin(x / w * 6.283 + ph)).toFixed(2)}`; return s + `L${w} ${h}Z`; };
+const liq = $("#liq"), ptxt = $("#ptxt"), caret = $("#caret");
+const pw1 = $("#pw1"), pw2 = $("#pw2"), sess = $("#sess"), sessN = $("#sessN"), itemP = $("#itemP"), ring = $("#ring"), ringN = $("#ringN"), cost = $("#cost");
+const fills = $$("#panel .f"), pcP1 = pc.querySelector("[fill='#e2d7cc']"), pcP2 = pc.querySelector("[fill='#e6d5c3']");
+const render = (t) => {
+  drawGL(t);
+  // typing
+  const n = C.keys.filter((k) => k <= t).length; ptxt.textContent = C.prompt.slice(0, n);
+  caret.style.opacity = t < .6 || t >= 2.2 ? (Math.floor(t / .3) % 2 ? 0 : 1) : 1;
+  if (t > C.hit) caret.style.opacity = 0;
+  // logo liquid: rises, sloshes, settles exactly on the icon's own shape
+  const f = ramp(t, C.impact + .2, C.impact + 1.5), w = Math.exp(-Math.max(t - C.impact - .4, 0) * 1.9);
+  const y0 = 760 - (760 - 530) * f + 18 * w * Math.sin(t * 7), A = 40 + 26 * w * Math.cos(t * 9), ph = 3 * w * Math.sin(t * 2.2);
+  let d = `M280 800L280 ${y0}`; for (let x = 288; x <= 744; x += 8) d += `L${x} ${(y0 - A * Math.sin((x - 304) / 416 * 6.283 + ph)).toFixed(1)}`;
+  liq.setAttribute("d", d + "L744 800Z");
+  // menu bar reading
+  itemP.textContent = Math.round(85 * ramp(t, 12.1, 13.1)) + "%";
+  // panel fill follows the app's real curve: 0.08 + level * 0.84, wave phase from BrimBackdrop
+  const pl = .85 * ramp(t, 13.4, 15), py = 708 - 708 * (.08 + pl * .84);
+  pw1.setAttribute("d", wavePath(py, 5, t * 1.6)); pw2.setAttribute("d", wavePath(py - 3, 7, -t * 1.1 + 2));
+  // bars fill as rows land; Session refills during the macro shot
+  fills.forEach((e, i) => { const p = +e.dataset.p, a = 13.8 + i * .08; e.style.width = p * ramp(t, a, a + .9) + "%"; });
+  const macro = ramp(t, 17, 17.6), sv = t < 16.9 ? 85 * ramp(t, 13.8, 14.7) : 85 * macro;
+  sess.style.width = sv + "%"; sessN.textContent = Math.round(sv) + "%"; sessN.style.color = sv >= 80 ? "#d13a36" : ""; sess.style.background = sv >= 80 ? "var(--hot)" : "var(--blue)";
+  const rv = 85 * ramp(t, 19.9, 20.9); ring.setAttribute("stroke-dasharray", `${rv} 100`); ringN.textContent = Math.round(rv);
+  // cost counter
+  cost.textContent = "$" + (30.85 * ramp(t, 26.9, 28.1)).toFixed(2);
+  // bubbles bob
+  bubs.forEach((b, i) => { b.style.marginTop = 7 * Math.sin(t * 1.5 + i * 1.3) + "px"; b.style.marginLeft = 4 * Math.sin(t * .9 + i * 2.1) + "px"; });
+  // clone panel wave
+  pcP1.setAttribute("d", wavePath(708 - 708 * .79, 5, t * 1.6)); pcP2.setAttribute("d", wavePath(708 - 708 * .79 - 3, 7, -t * 1.1 + 2));
+};
+
+/* ---------- timeline ---------- */
+const tl = gsap.timeline({ paused: true });
+const B = C.B;
+const on = (q, t) => tl.set(q, { opacity: 1 }, t), off = (q, t) => tl.set(q, { opacity: 0 }, t);
+const mask = (q, t, each = .09) => tl.fromTo(q + " .mask>span", { yPercent: 112 }, { yPercent: 0, duration: .75, ease: "expo.out", stagger: each }, t);
+const maskOut = (q, end) => tl.to(q + " .mask>span", { yPercent: -112, duration: .3, ease: "power3.in" }, end - .3);
+const rise = (q, t, y = 26, dur = .55) => tl.fromTo(q, { opacity: 0, y }, { opacity: 1, y: 0, duration: dur, ease: "power3.out" }, t);
+const fade = (q, end, dur = .28) => tl.to(q, { opacity: 0, duration: dur, ease: "power2.in" }, end - dur);
+// camera: content point (px,py) lands on screen point (tx,ty) at zoom Z
+const cam = (q, px, py, Z, t, d, tx = 960, ty = 540, ease = "expo.inOut") => tl.to(q, { scale: Z, x: tx - 960 - (px - 960) * Z, y: ty - 540 - (py - 540) * Z, duration: d, ease }, t);
+
+// measure before anything moves
+const R0 = $("#root").getBoundingClientRect();
+const box = (q) => { const r = $(q).getBoundingClientRect(); return { x: r.left - R0.left, y: r.top - R0.top, w: r.width, h: r.height, cx: r.left - R0.left + r.width / 2, cy: r.top - R0.top + r.height / 2 }; };
+const item = box("#item"), sessRow = box("#sess").y, track = $("#sess").parentElement.getBoundingClientRect(), tA = box("#tA"), tP = box("#tP");
+const tick = box("#sessT");
+
+tl.to({ set t(v) { render(v); }, get t() { return 0; } }, { t: C.DUR, duration: C.DUR, ease: "none" }, 0);
+
+// 1 ---- terminal
+on("#s1", 0);
+tl.fromTo("#c1", { scale: 1 }, { scale: 1.14, duration: C.hit, ease: "none" }, 0);
+tl.fromTo("#term1", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: .5, ease: "power3.out" }, .05);
+$$(".tl").forEach((e, i) => tl.fromTo(e, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .14, ease: "power2.out" }, C.lines[i]));
+tl.set("#limit", { opacity: 1 }, C.hit);
+tl.fromTo("#flash", { opacity: 1 }, { opacity: 0, duration: 1.1, ease: "power2.out", immediateRender: false }, C.hit);
+tl.to("#c1", { keyframes: [{ x: 16, y: -9, duration: .05 }, { x: -13, y: 7, duration: .05 }, { x: 8, y: -4, duration: .06 }, { x: -3, y: 2, duration: .07 }, { x: 0, y: 0, duration: .08 }] }, C.hit);
+tl.to("#term1", { opacity: .13, duration: .35, ease: "power2.out" }, C.hit + .42);
+fade("#s1", 6.6, .3); off("#s1", 6.62);
+
+on("#s1b", 5.2); mask("#s1b", 5.2, .24); maskOut("#s1b", 6.6); off("#s1b", 6.62);
+
+// drop falls into the ring
+tl.fromTo("#drop", { opacity: 1, y: -130, scaleY: .9 }, { y: 505, scaleY: 1.22, duration: .6, ease: "power2.in" }, C.impact - .6); off("#drop", C.impact);
+
+// 2 ---- logo
+on("#s2", C.impact);
+tl.set("#ringP", { attr: { "pathLength": 100, "stroke-dasharray": "0 100" }, rotation: -90, transformOrigin: "50% 50%" }, 0);
+tl.to("#ringP", { attr: { "stroke-dasharray": "100 0" }, duration: 1.05, ease: "expo.out" }, C.impact);
+tl.fromTo("#mark", { scale: .78 }, { scale: 1, duration: 1.1, ease: "expo.out" }, C.impact);
+tl.to("#mark", { x: -245, y: -45, scale: .62, duration: .8, ease: "expo.inOut" }, 9.3);
+tl.set("#word .mask>span", { yPercent: 112 }, 0);
+tl.to("#word .mask>span", { yPercent: 0, duration: .8, ease: "expo.out" }, 9.6);
+rise("#tag", 10.2);
+fade("#word", 11.4); fade("#tag", 11.4);
+// the mark flies up and becomes the menu bar reading
+const Z0 = 3.2, itemTY = 420;
+tl.to("#mark", { x: 880 - 960 + 0, y: itemTY - 540, scale: (Z0 * 20) / 520 * 1.6, duration: .75, ease: "expo.inOut" }, 11.4);
+tl.to("#mark", { opacity: 0, duration: .12 }, 12.05); off("#s2", 12.2);
+
+// 3 ---- menu bar, tight
+on("#s3", 11.8);
+tl.set("#c3", { scale: Z0, x: 960 - 960 - (item.cx - 960) * Z0, y: itemTY - 540 - (item.cy - 540) * Z0 }, 0);
+tl.fromTo("#mbar", { opacity: 0 }, { opacity: 1, duration: .3 }, 11.8);
+tl.set("#panel", { opacity: 0 }, 0);
+tl.fromTo("#itemI", { opacity: 0, scale: .4 }, { opacity: 1, scale: 1, duration: .3, ease: "power3.out" }, 12.05);
+// cursor glides to the reading, presses on the beat
+tl.set("#cursor", { opacity: 1, x: 1500, y: 880 }, 12.2);
+tl.to("#cursor", { x: 972, y: 430, duration: .85, ease: "power2.inOut" }, 12.25);
+tl.to("#cursor", { scale: .86, duration: .07, yoyo: true, repeat: 1 }, C.click1 - .05);
+tl.set("#item", { backgroundColor: "rgba(255,255,255,.28)" }, C.click1);
+// wide
+cam("#c3", 960, 540, 1, C.click1 + .05, .75);
+tl.to("#cursor", { opacity: 0, duration: .2 }, C.click1 + .2);
+tl.fromTo("#panel", { opacity: 0, y: -18, scale: 1.27 }, { opacity: 1, y: 0, scale: 1.35, duration: .6, ease: "back.out(1.3)" }, C.click1 + .25);
+tl.fromTo("#panel .r", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .35, ease: "power3.out", stagger: .05 }, C.rows[0] - .1);
+on("#cp1", 14.4); mask("#cp1", 14.4, .18); rise("#cp1 .sub", 14.9, 20); tl.to("#c3", { scale: 1.022, duration: 2, ease: "none" }, 14.8);
+maskOut("#cp1", 16.6); fade("#cp1 .sub", 16.6); off("#cp1", 16.62);
+
+// 4 ---- macro: Session row, Session refills, pace mark
+const tk = tick; const Zm = 3.1, rowX = track.left - R0.left + track.width * .35, rowY = sessRow + 4;
+cam("#c3", rowX, rowY, Zm, 16.8, .6, 960, 450);
+const tkSX = 960 + (tk.cx - rowX) * Zm, tkSY = 450 + (tk.y + tk.h - rowY) * Zm;
+tl.set("#callA",{xPercent:-50,x:0},0);tl.set("#callB",{xPercent:-50,x:0},0);rise("#callA", 17.4, 18); fade("#callA", 18.28);
+tl.set("#leader", { left: tkSX - 1.5, top: tkSY + 8, height: 590 - tkSY - 8 }, 0);
+tl.fromTo("#leader", { opacity: 1, scaleY: 0 }, { opacity: 1, scaleY: 1, duration: .32, ease: "power3.out" }, 18.3);
+rise("#callB", 18.42, 14, .45); tl.fromTo("#sessT", { scaleY: 1 }, { scaleY: 1.5, duration: .22, yoyo: true, repeat: 1, ease: "sine.inOut" }, 18.3);
+fade("#callB", 19.5, .24); fade("#leader", 19.5, .2);
+
+// 5 ---- pull out, Priority
+const pZ = 1.72; // panel fills the right of frame
+cam("#c3", 1500, 180, pZ, 19.2, .6, 1330, 320);
+tl.set("#tA", { className: "" }, C.click2).set("#tP", { className: "on" }, C.click2);
+tl.fromTo("#tpill", { x: 156 }, { x: 0, duration: .34, ease: "power3.inOut" }, C.click2 - .06);
+tl.fromTo("#tpill", { x: 156 }, { x: 156, duration: .01 }, 0);
+tl.to("#pall", { opacity: 0, x: 60, duration: .24, ease: "power2.in" }, C.click2);
+tl.fromTo("#ppri", { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: .34, ease: "power3.out" }, C.click2 + .08);
+tl.to("#panel", { height: 268, duration: .5, ease: "power3.inOut" }, C.click2 + .04);
+tl.to("#pw", { opacity: .6, duration: .3 }, C.click2);
+on("#cp2", 20.1); mask("#cp2", 20.1, .18); maskOut("#cp2", 21.7); off("#cp2", 21.72);
+
+// 6 ---- flood: panel lifts away as the water takes the frame
+tl.to("#c3", { y: "-=1100", duration: .85, ease: "expo.in" }, 21.6); off("#s3", 22.5);
+on("#s6", 22.3);
+bubs.forEach((b, i) => tl.fromTo(b, { y: 860, scale: .7, opacity: 1 }, { y: 0, scale: 1, duration: .95, ease: "back.out(1.25)" }, C.bubbles[i] - .55));
+mask("#pvH", 24.0, .24);
+tl.to(bubs, { y: -1200, duration: .6, ease: "power3.in", stagger: .012 }, 25.95);
+maskOut("#pvH", 26.3); off("#s6", 26.6);
+
+// 7 ---- cost
+on("#s7", 26.7);
+rise("#cost", 26.7, 40, .6); rise("#costS", 27.2, 20); rise("#costR", 27.5, 20); rise("#costN", 27.7, 14);
+fade("#s7", 28.75, .2); off("#s7", 28.76);
+
+// 8 ---- backgrounds
+on("#s8", 28.8);
+tl.fromTo(pc, { y: 1000 }, { y: 0, duration: .5, ease: "expo.out" }, 28.8);
+tl.fromTo(".bgs", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: .4, ease: "power3.out" }, 28.8);
+const pick = (i, t) => { ["#b0", "#b1", "#b2"].forEach((q, j) => tl.to(q, { opacity: j === i ? 1 : .25, duration: .18 }, t)); };
+pick(0, 28.8); pick(1, C.swaps[1]); pick(2, C.swaps[2]);
+tl.to(pcF, { opacity: 0, duration: .25 }, C.swaps[1]);
+tl.to(pc.querySelector("#fxA"), { opacity: 1, duration: .25 }, C.swaps[1]); tl.to(pc.querySelector("#fxA"), { opacity: 0, duration: .25 }, C.swaps[2]);
+tl.to(pc.querySelector("#fxS"), { opacity: 1, duration: .25 }, C.swaps[2]);
+tl.to(pc, { y: -1100, duration: .35, ease: "power3.in" }, 30.87); fade(".bgs", 31.18, .25); off("#s8", 31.2);
+
+// 9 ---- privacy, one per bar-third
+on("#s9", 31.2);
+["#pv0", "#pv1", "#pv2"].forEach((q, i) => {
+  const a = C.privacy[i], b = C.privacy[i + 1] ?? 33.6;
+  tl.set(q, { opacity: 0 }, 0);
+  tl.fromTo(q, { opacity: 0, scale: 1.14 }, { opacity: 1, scale: 1, duration: .32, ease: "expo.out" }, a);
+  tl.set(q, { opacity: 0 }, b - .001);
+});
+off("#s9", 33.6);
+
+// 10 --- raycast
+on("#s10", 33.6);
+mask("#rcT", 33.65, .12);
+C.cc.forEach((t, i) => { tl.fromTo("#k" + i, { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: .1 }, t - .01); tl.fromTo("#k" + i, { boxShadow: "inset 0 0 0 2px rgba(255,255,255,.3),0 2px 0 rgba(0,0,0,.2)" }, { boxShadow: "inset 0 0 0 2px rgba(255,255,255,.3),0 8px 0 rgba(0,0,0,.2)", duration: .12 }, t); });
+tl.fromTo("#ray", { opacity: 0, scale: .96, y: 24 }, { opacity: 1, scale: 1, y: 0, duration: .5, ease: "back.out(1.2)" }, C.rc);
+fade("#s10", 36, .24); off("#s10", 36.02);
+
+// 11 --- flow restored
+on("#s11", 36);
+mask("#flH", 36.1, .36);
+tl.fromTo("#term2", { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: .5, ease: "power3.out" }, 36.05);
+$$(".ok2").forEach((e, i) => tl.fromTo(e, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .18, ease: "power2.out" }, C.ok[i]));
+fade("#s11", 38.7, .35); off("#s11", 38.72);
+
+// 12 --- to the brim
+on("#s12", 39.6);
+tl.fromTo("#mark2", { opacity: 0, scale: .84 }, { opacity: 1, scale: 1, duration: .9, ease: "expo.out" }, 39.6);
+tl.set("#endW .mask>span", { yPercent: 112 }, 0); tl.to("#endW .mask>span", { yPercent: 0, duration: .85, ease: "expo.out" }, 39.9);
+rise("#endT", 40.5); rise("#endC", 41.1, 18); rise("#endU", 41.4, 18);
+tl.to("#s12", { opacity: 1, duration: C.DUR - 41.9 }, 41.9);
+
+window.__timelines["main"] = tl;
+render(0);
+});
+</script>
+</body>
+</html>

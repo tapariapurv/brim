@@ -21,6 +21,7 @@
 <header class="top">
   <a class="mark" href="#top"><img src="icon.png" alt="" width="26" height="26">Brim</a>
   <nav aria-label="Main">
+    <a href="#film">Film</a>
     <a href="#limits">Features</a>
     <a href="#updates">Updates</a>
     <a href="#raycast">Raycast</a>
@@ -44,6 +45,7 @@
       <p class="sub" data-r>A free Mac menu bar app that shows how close Claude, Codex, Cursor and nine more AI coding tools are to running out.</p>
       <div class="actions" data-r>
         <a class="btn" href="https://github.com/tapariapurv/brim/releases/latest/download/Brim.dmg">Download for Mac</a>
+        <a class="link" href="#film">Watch the film</a>
         <span class="note">Version 0.2.0. Needs macOS 26.</span>
       </div>
     </div>
@@ -56,6 +58,24 @@
       </div>
       <label class="try" for="level">Drag to fill the session limit</label>
       <input id="level" type="range" min="0" max="100" value="28">
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="film">
+  <div class="wrap">
+    <p class="kick" data-r>The film</p>
+    <h2 data-r>See it in 44 seconds</h2>
+    <p class="sub" data-r>Press play, then keep scrolling. The film follows you down the page.</p>
+    <div class="film-frame" id="film-frame" data-r>
+      <div class="film-player" id="film-player">
+        <video id="film-video" controls playsinline preload="metadata" poster="media/brim-film-poster.jpg" aria-label="Brim film, 44 seconds, with sound">
+          <source src="media/brim-film.mp4" type="video/mp4">
+          <a href="media/brim-film.mp4">Download the film</a>
+        </video>
+        <button class="film-play" id="film-play" type="button" aria-label="Play the film"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l11-6.5a1 1 0 0 0 0-1.72l-11-6.5A1 1 0 0 0 8 5.5Z" fill="currentColor"/></svg></button>
+        <button class="film-close" id="film-close" type="button" aria-label="Stop the film and close the small player"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+      </div>
     </div>
   </div>
 </section>
