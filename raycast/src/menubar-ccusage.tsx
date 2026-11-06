@@ -8,7 +8,7 @@ import { useTotalUsage } from "./hooks/useTotalUsage";
 import { useClaudeUsageLimits } from "./hooks/useClaudeUsageLimits";
 import { useWorkingTime } from "./hooks/useWorkingTime";
 import { formatCost, formatCostDelta, formatDuration, formatTokensAsMTok } from "./utils/data-formatter";
-import { formatTimeRemaining, createProgressBar } from "./utils/usage-limits-formatter";
+import { formatResetTime, createProgressBar } from "./utils/usage-limits-formatter";
 import { pieIcon } from "./utils/pie-icon";
 import { formatTimeRemainingCustom } from "./utils/time-remaining-formatter";
 import { getLimitRows } from "./utils/limit-rows";
@@ -153,7 +153,7 @@ export default function MenuBarccusage() {
   const rateLimitsSectionTitle = `Rate Limits · ${preferRemaining ? "Remaining" : "Consumed"}`;
 
   const limitInfo = (utilization: number, resetsAt: string | null): string =>
-    `${displayUtil(utilization).toFixed(0)}%  ↻ ${resetsAt ? formatTimeRemaining(resetsAt) : "N/A"}`;
+    `${displayUtil(utilization).toFixed(0)}%  · ${resetsAt ? `resets by ${formatResetTime(resetsAt)}` : "no reset time"}`;
 
   const limitBar = (utilization: number): string => createProgressBar(displayUtil(utilization), 22, progressBarStyle);
 

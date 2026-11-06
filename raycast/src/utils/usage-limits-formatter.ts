@@ -1,30 +1,17 @@
 import { Color } from "@raycast/api";
 
-export const formatTimeRemaining = (resetTimeStr: string): string => {
-  try {
-    const resetTime = new Date(resetTimeStr);
-    const now = new Date();
-    const diffMs = resetTime.getTime() - now.getTime();
+/** When a limit resets, as a clock time: "3:45 PM" today, "Wed 3:45 PM" this week, "Nov 20, 3:45 PM" after that. */
+export const formatResetTime = (resetTimeStr: string, now: Date = new Date()): string => {
+  const reset = new Date(resetTimeStr);
+  if (Number.isNaN(reset.getTime())) return "Unknown";
+  if (reset <= now) return "Resetting...";
 
-    if (diffMs <= 0) {
-      return "Resetting...";
-    }
-
-    const totalSeconds = Math.floor(diffMs / 1000);
-    const days = Math.floor(totalSeconds / 86400);
-    const hours = Math.floor((totalSeconds % 86400) / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-
-    if (days > 0) {
-      return `${days}d ${hours}h`;
-    } else if (hours > 0) {
-      return `${hours}h ${minutes}m`;
-    } else {
-      return `${minutes}m`;
-    }
-  } catch {
-    return "Unknown";
+  const time = reset.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  if (reset.toDateString() === now.toDateString()) return time;
+  if (reset.getTime() - now.getTime() < 6 * 86400000) {
+    return `${reset.toLocaleDateString(undefined, { weekday: "short" })} ${time}`;
   }
+  return `${reset.toLocaleDateString(undefined, { month: "short", day: "numeric" })}, ${time}`;
 };
 
 export const formatRelativeTime = (date: Date | null): string => {

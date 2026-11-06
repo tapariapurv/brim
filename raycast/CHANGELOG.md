@@ -4,6 +4,7 @@
 
 - Usage Limits comes first and reads from Brim, with no calls to Anthropic.
 - Limits are drawn as pill bars with a pace tick.
+- Limits show the time they reset by, not a countdown.
 - Forked from ccusage for Raycast. Its earlier history is below.
 
 ## [Support plans without a 5-hour limit] - 2026-11-04

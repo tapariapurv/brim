@@ -1,7 +1,7 @@
 import { List, Icon, Color, Action, ActionPanel } from "@raycast/api";
 import { getProgressIcon } from "@raycast/utils";
 import { useClaudeUsageLimits } from "../hooks/useClaudeUsageLimits";
-import { formatTimeRemaining, formatRelativeTime, calculateEstimatedUsage } from "../utils/usage-limits-formatter";
+import { formatResetTime, formatRelativeTime, calculateEstimatedUsage } from "../utils/usage-limits-formatter";
 import { formatDuration } from "../utils/data-formatter";
 import { getLimitRows } from "../utils/limit-rows";
 import { showRemainingUsage } from "../preferences";
@@ -92,7 +92,7 @@ export function UsageLimits() {
                 text={`${row.utilization.toFixed(0)}% Used`}
               />
               {row.resets_at ? (
-                <List.Item.Detail.Metadata.Label title="Resets In" text={formatTimeRemaining(row.resets_at)} />
+                <List.Item.Detail.Metadata.Label title="Resets By" text={formatResetTime(row.resets_at)} />
               ) : null}
               {estimate === null ? null : (
                 <List.Item.Detail.Metadata.TagList title="On Pace For">

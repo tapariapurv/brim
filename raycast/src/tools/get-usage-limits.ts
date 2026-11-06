@@ -1,5 +1,6 @@
 import { fetchClaudeUsageLimits } from "../utils/claude-api-client";
 import { getLimitRows } from "../utils/limit-rows";
+import { formatResetTime } from "../utils/usage-limits-formatter";
 import { LimitWindow } from "../types/usage-types";
 
 type Input = {
@@ -35,32 +36,7 @@ export default async function getUsageLimits(input?: Input): Promise<{
 
   const usageLimitsData = result.data;
 
-  const formatResetTime = (isoString: string | null): string => {
-    if (!isoString) {
-      return "N/A";
-    }
-
-    const resetTime = new Date(isoString);
-    const now = new Date();
-    const diffMs = resetTime.getTime() - now.getTime();
-
-    if (diffMs <= 0) {
-      return "Resetting now";
-    }
-
-    const totalSeconds = Math.floor(diffMs / 1000);
-    const days = Math.floor(totalSeconds / 86400);
-    const hours = Math.floor((totalSeconds % 86400) / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-
-    if (days > 0) {
-      return `${days}d ${hours}h`;
-    } else if (hours > 0) {
-      return `${hours}h ${minutes}m`;
-    } else {
-      return `${minutes}m`;
-    }
-  };
+  const resetsBy = (isoString: string | null): string => (isoString ? formatResetTime(isoString) : "N/A");
 
   const scopedLimits = getLimitRows(usageLimitsData).flatMap((row) =>
     row.period === null
@@ -70,7 +46,7 @@ export default async function getUsageLimits(input?: Input): Promise<{
             label: row.label,
             period: row.period,
             utilization: row.utilization,
-            resetsAt: formatResetTime(row.resets_at),
+            resetsAt: resetsBy(row.resets_at),
             ...(input?.includeRawTimestamps && { rawTimestamp: row.resets_at ?? undefined }),
           },
         ],
@@ -80,7 +56,7 @@ export default async function getUsageLimits(input?: Input): Promise<{
     window
       ? {
           utilization: Math.round(window.utilization * 10) / 10,
-          resetsAt: formatResetTime(window.resets_at),
+          resetsAt: resetsBy(window.resets_at),
           ...(input?.includeRawTimestamps && { rawTimestamp: window.resets_at ?? undefined }),
         }
       : null;
