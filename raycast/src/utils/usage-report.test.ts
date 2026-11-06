@@ -93,7 +93,11 @@ it("publishes sessions without waiting for summaries", async () => {
 it("isolates a session timeout, avoids fallback scans, and allows retry", async () => {
   const summaryPending = getSummaryReport();
   const history = getSessionReport();
-  exec.mock.calls[1][3](Object.assign(new Error("timeout"), { killed: true, signal: "SIGTERM" as const }), "", "");
+  exec.mock.calls[1][3](
+    Object.assign(new Error("timeout"), { killed: true, signal: "SIGTERM" as const }) as never,
+    "",
+    "",
+  );
   await expect(history).rejects.toThrow("ccusage report timed out");
   expect(exec).toHaveBeenCalledTimes(2);
   complete(0, summary);
@@ -107,7 +111,11 @@ it("isolates a session timeout, avoids fallback scans, and allows retry", async 
 
 it("surfaces summary timeouts without launching legacy fallback scans", async () => {
   const pending = getSummaryReport();
-  exec.mock.calls[0][3](Object.assign(new Error("timeout"), { killed: true, signal: "SIGTERM" as const }), "", "");
+  exec.mock.calls[0][3](
+    Object.assign(new Error("timeout"), { killed: true, signal: "SIGTERM" as const }) as never,
+    "",
+    "",
+  );
   await expect(pending).rejects.toThrow("ccusage report timed out");
   expect(exec).toHaveBeenCalledTimes(1);
   const retry = getSummaryReport();
@@ -118,7 +126,7 @@ it("surfaces summary timeouts without launching legacy fallback scans", async ()
 it("runs legacy summary reports sequentially when --sections is unsupported", async () => {
   (await import("../preferences")).preferences.useDirectCcusageCommand = true;
   const pending = getSummaryReport();
-  exec.mock.calls[0][3](Object.assign(new Error("bad option"), { code: 1 }), "", "Unknown option: --sections");
+  exec.mock.calls[0][3](Object.assign(new Error("bad option"), { code: 1 }) as never, "", "Unknown option: --sections");
   for (const [index, section] of ["daily", "weekly", "monthly"].entries()) {
     await Promise.resolve();
     expect(exec).toHaveBeenCalledTimes(index + 2);
@@ -215,7 +223,7 @@ it("forces a refresh on request and preserves cached data after a failure", asyn
   complete(0, sessions);
   await first;
   const refresh = getSessionReport(true);
-  exec.mock.calls[1][3](new Error("offline"), "", "");
+  exec.mock.calls[1][3](new Error("offline") as never, "", "");
   await expect(refresh).rejects.toThrow();
   await expect(getSessionReport()).resolves.toEqual({ recentSessions: [], topModels: [] });
   expect(exec).toHaveBeenCalledTimes(2);

@@ -88,7 +88,7 @@ async function complete(cost: number) {
 }
 
 async function fail() {
-  await act(async () => pending.shift()!(new Error("offline"), "", ""));
+  await act(async () => pending.shift()!(new Error("offline") as never, "", ""));
 }
 
 async function advance(ms: number) {
