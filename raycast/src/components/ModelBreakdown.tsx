@@ -9,6 +9,7 @@ import {
 } from "../utils/usage-calculator";
 import { groupModelsByTier } from "../utils/model-utils";
 import { useSessionUsage } from "../hooks/useSessionUsage";
+import { reserveValueWidths } from "../utils/reserve-value-width";
 import { ErrorMetadata } from "./ErrorMetadata";
 import { StandardActions, type ExternalLink } from "./common/StandardActions";
 import { MESSAGES } from "../utils/messages";
@@ -113,7 +114,7 @@ export function ModelBreakdown() {
       id="model-breakdown"
       title="Models"
       icon={Icon.BarChart}
-      detail={<List.Item.Detail isLoading={isLoading} metadata={renderDetailMetadata()} />}
+      detail={<List.Item.Detail isLoading={isLoading} metadata={reserveValueWidths(renderDetailMetadata())} />}
       actions={<StandardActions externalLinks={externalLinks} />}
     />
   );

@@ -10,6 +10,7 @@ import {
 import { useTotalUsage } from "../hooks/useTotalUsage";
 import { useDailyUsage } from "../hooks/useDailyUsage";
 import { useSessionUsage } from "../hooks/useSessionUsage";
+import { reserveValueWidths } from "../utils/reserve-value-width";
 import { ErrorMetadata } from "./ErrorMetadata";
 import { StandardActions, type ExternalLink } from "./common/StandardActions";
 import { MESSAGES } from "../utils/messages";
@@ -131,7 +132,7 @@ export function CostAnalysis() {
       id="cost-analysis"
       title="Costs"
       icon={Icon.Coins}
-      detail={<List.Item.Detail isLoading={isLoading} metadata={renderDetailMetadata()} />}
+      detail={<List.Item.Detail isLoading={isLoading} metadata={reserveValueWidths(renderDetailMetadata())} />}
       actions={<StandardActions externalLinks={externalLinks} />}
     />
   );

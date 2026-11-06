@@ -1,4 +1,4 @@
-import { applyAgentOrder, boldText, limitTitle, moveAgent, parseBrimAgents } from "./brim-agents";
+import { applyAgentOrder, boldText, moveAgent, parseBrimAgents } from "./brim-agents";
 
 const output = JSON.stringify({
   providers: {
@@ -14,25 +14,11 @@ describe("brim agents", () => {
     expect(codex.limits[0]).toMatchObject({ label: "Credits", utilization: null, value: "821 credits" });
   });
 
-  it("keeps each limit's value in its title, rounded to cents", () => {
+  it("rounds non-percent values to two decimals", () => {
     const [agent] = parseBrimAgents(
-      JSON.stringify({
-        providers: {
-          "x@1": {
-            resources: {
-              nonGeminiSession: { unit: "percent", used: 39.4 },
-              rateLimitResets: { unit: "resets", available: 2 },
-              extraUsageSpent: { unit: "usd", used: 12.3456 },
-            },
-          },
-        },
-      }),
+      JSON.stringify({ providers: { "x@1": { resources: { extraUsageSpent: { unit: "usd", used: 12.3456 } } } } }),
     );
-    expect(agent.limits.map(limitTitle)).toEqual([
-      "Non Gemini Session · 39% Used",
-      "Rate Limit Resets · 2 resets",
-      "Extra Usage Spent · 12.35 usd",
-    ]);
+    expect(agent.limits[0].value).toBe("12.35 usd");
   });
 
   it("applies the saved order and leaves new agents at the end", () => {

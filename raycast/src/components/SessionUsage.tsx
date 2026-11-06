@@ -8,6 +8,7 @@ import {
   calculateEfficiencyMetrics,
 } from "../utils/usage-calculator";
 import { useSessionUsage } from "../hooks/useSessionUsage";
+import { reserveValueWidths } from "../utils/reserve-value-width";
 import { ErrorMetadata } from "./ErrorMetadata";
 import { StandardActions } from "./common/StandardActions";
 import { MESSAGES } from "../utils/messages";
@@ -76,7 +77,7 @@ export function SessionUsage() {
       id="sessions"
       title="Sessions"
       icon={Icon.List}
-      detail={<List.Item.Detail isLoading={isLoading} metadata={renderDetailMetadata()} />}
+      detail={<List.Item.Detail isLoading={isLoading} metadata={reserveValueWidths(renderDetailMetadata())} />}
       actions={<StandardActions />}
     />
   );

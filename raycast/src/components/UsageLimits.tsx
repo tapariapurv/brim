@@ -2,8 +2,9 @@ import { List, Icon, Color, Action, ActionPanel } from "@raycast/api";
 import { getProgressIcon, useCachedPromise, useCachedState } from "@raycast/utils";
 import { Fragment, ReactNode, useEffect } from "react";
 import { getReportRefreshInterval } from "../utils/usage-report";
-import { applyAgentOrder, boldText, fetchBrimAgents, limitTitle, moveAgent } from "../utils/brim-agents";
+import { applyAgentOrder, boldText, fetchBrimAgents, moveAgent } from "../utils/brim-agents";
 import { calculateEstimatedUsage, formatResetTime } from "../utils/usage-limits-formatter";
+import { reserveValueWidths } from "../utils/reserve-value-width";
 import { ErrorMetadata } from "./ErrorMetadata";
 
 const levelColor = (percent: number) => (percent >= 90 ? Color.Red : percent >= 70 ? Color.Orange : Color.Green);
@@ -47,10 +48,11 @@ export function UsageLimits() {
               return (
                 <Fragment key={limit.key}>
                   <List.Item.Detail.Metadata.Label
-                    title={limitTitle(limit)}
+                    title={limit.label}
                     icon={
                       percent === null ? undefined : getProgressIcon(Math.min(percent, 100) / 100, levelColor(percent))
                     }
+                    text={percent === null ? (limit.value ?? "") : `${percent.toFixed(0)}% Used`}
                   />
                   {limit.resetsAt ? (
                     <List.Item.Detail.Metadata.Label title="Resets By" text={formatResetTime(limit.resetsAt)} />
@@ -73,7 +75,7 @@ export function UsageLimits() {
       id="usage-limits"
       title="Usage Limits"
       icon={Icon.Gauge}
-      detail={<List.Item.Detail isLoading={isLoading} metadata={renderDetailMetadata()} />}
+      detail={<List.Item.Detail isLoading={isLoading} metadata={reserveValueWidths(renderDetailMetadata())} />}
       actions={
         <ActionPanel>
           <Action title="Refresh Usage Limits" icon={Icon.ArrowClockwise} onAction={revalidate} />

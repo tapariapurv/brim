@@ -9,6 +9,7 @@ import {
   getCostPerMTok,
 } from "../utils/data-formatter";
 import { useMonthlyUsage } from "../hooks/useMonthlyUsage";
+import { reserveValueWidths } from "../utils/reserve-value-width";
 import { ErrorMetadata } from "./ErrorMetadata";
 import { StandardActions, type ExternalLink } from "./common/StandardActions";
 
@@ -81,7 +82,7 @@ export function MonthlyUsage() {
       id="month"
       title="This Month"
       icon={Icon.Calendar}
-      detail={<List.Item.Detail isLoading={isLoading} metadata={renderDetailMetadata()} />}
+      detail={<List.Item.Detail isLoading={isLoading} metadata={reserveValueWidths(renderDetailMetadata())} />}
       actions={<StandardActions externalLinks={externalLinks} />}
     />
   );

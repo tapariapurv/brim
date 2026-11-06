@@ -9,6 +9,7 @@ import {
 } from "../utils/data-formatter";
 import { getCurrentLocalDate } from "../utils/date-formatter";
 import { useDailyUsage } from "../hooks/useDailyUsage";
+import { reserveValueWidths } from "../utils/reserve-value-width";
 import { ErrorMetadata } from "./ErrorMetadata";
 import { StandardActions, type ExternalLink } from "./common/StandardActions";
 
@@ -91,7 +92,7 @@ export function DailyUsage() {
       id="today"
       title="Today"
       icon={Icon.Sun}
-      detail={<List.Item.Detail isLoading={isLoading} metadata={renderDetailMetadata()} />}
+      detail={<List.Item.Detail isLoading={isLoading} metadata={reserveValueWidths(renderDetailMetadata())} />}
       actions={<StandardActions externalLinks={externalLinks} />}
     />
   );
