@@ -1,4 +1,10 @@
-# Claude Usage (ccusage) Changelog
+# Claude Usage Limits Changelog
+
+## [Initial Version] - {PR_MERGE_DATE}
+
+- Usage Limits comes first and reads from Brim, with no calls to Anthropic.
+- Limits are drawn as pill bars with a pace tick.
+- Forked from ccusage for Raycast. Its earlier history is below.
 
 ## [Support plans without a 5-hour limit] - 2026-11-04
 

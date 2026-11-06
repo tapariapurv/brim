@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brim: AI coding usage limits in your Mac menu bar</title>
+<meta name="description" content="Brim is a free, open source Mac menu bar app that shows how close Claude, Codex, Cursor and nine more AI coding tools are to their limits.">
+<meta property="og:title" content="Brim: know your limits">
+<meta property="og:description" content="AI coding usage limits in your Mac menu bar. Free and open source.">
+<meta property="og:image" content="https://tapariapurv.github.io/brim/icon.png">
+<link rel="icon" href="icon.png">
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=roundo@400,500,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="corners">
+  <a class="mark" href="#top"><img src="icon.png" alt="" width="32" height="32">Brim</a>
+  <nav aria-label="Main">
+    <a href="#limits">Features</a>
+    <a href="#raycast">Raycast</a>
+    <a href="#install">Install</a>
+    <a href="https://github.com/tapariapurv/brim">GitHub</a>
+  </nav>
+</header>
+
+<main id="top">
+
+<section class="ch hero" style="--bg:#D8F3F1;--ink:#03262B" data-next="#06333A">
+  <div class="liquid" id="liquid" aria-hidden="true">
+    <svg class="wave" viewBox="0 0 2400 40" preserveAspectRatio="none"><path d="M0 20 Q 150 0 300 20 T 600 20 T 900 20 T 1200 20 T 1500 20 T 1800 20 T 2100 20 T 2400 20 V 40 H 0 Z"/></svg>
+  </div>
+  <div class="grid hero-grid">
+    <div class="hero-copy">
+      <h1 data-r>Know your limits</h1>
+      <p class="lead" data-r>Brim is a free Mac menu bar app that shows how close Claude, Codex, Cursor and nine more AI coding tools are to their limits.</p>
+      <div class="actions" data-r>
+        <a class="btn" href="https://github.com/tapariapurv/brim/releases/latest/download/Brim.dmg">Download for Mac</a>
+        <span class="note">Version 0.1.0. Needs macOS 26.</span>
+      </div>
+    </div>
+    <div class="hero-side" data-r>
+      <div class="panel" data-ui>
+        <div class="menubar"><span id="mb">Claude 28%</span></div>
+        <div class="row">
+          <div class="row-top"><b>Session</b><span id="pv">28% used</span></div>
+          <div class="bar" style="--v:.28" id="hb"><i></i></div>
+          <div class="row-sub"><span>Claude</span><span id="pm">On pace</span></div>
+        </div>
+        <label class="try" for="level">Drag to fill the session limit</label>
+        <input id="level" type="range" min="0" max="100" value="28">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ch" id="limits" style="--bg:#06333A;--ink:#F2FBFA" data-next="#7FE0DB">
+  <div class="grid split">
+    <div>
+      <h2 data-r>Every limit, one glance</h2>
+      <p class="body" data-r>Add as many accounts as you use. Priority shows what's closest to running out. All Usage shows the rest. Choose which one opens first.</p>
+      <p class="body" data-r>Signed out of Claude Code or Codex? Brim reads their local usage logs instead and prices them from public API rates. Anything worked out that way is marked est.</p>
+    </div>
+    <div class="panel big" data-ui data-r>
+      <div class="tabs"><span>Priority</span><span class="on">All Usage</span></div>
+      <h3>Claude</h3>
+      <div class="row"><div class="row-top"><b>Session</b><span>64% used</span></div><div class="bar warnless" style="--v:.64"><i></i></div><div class="row-sub"><span>Resets in 2h 14m</span><span>On pace for 88%</span></div></div>
+      <div class="row"><div class="row-top"><b>Weekly</b><span>31% used</span></div><div class="bar" style="--v:.31"><i></i></div><div class="row-sub"><span>Resets in 4d 6h</span><span>$212.40 est.</span></div></div>
+      <h3>Codex</h3>
+      <div class="row"><div class="row-top"><b>Weekly</b><span>92% used</span></div><div class="bar hot" style="--v:.92"><i></i></div><div class="row-sub"><span>Resets in 9h 02m</span><span>1.2M tokens today</span></div></div>
+      <h3>Cursor</h3>
+      <div class="row"><div class="row-top"><b>Monthly</b><span>12% used</span></div><div class="bar" style="--v:.12"><i></i></div><div class="row-sub"><span>Resets in 18d</span><span>$2.40 of $20</span></div></div>
+      <p class="sample">Sample figures</p>
+    </div>
+  </div>
+</section>
+
+<section class="ch" id="refresh" style="--bg:#7FE0DB;--ink:#03262B" data-next="#FFD84D">
+  <div class="grid">
+    <h2 class="wide" data-r>Refresh without getting blocked</h2>
+    <p class="body lede" data-r>Anthropic's usage endpoint allows few reads an hour, and Claude Code draws on the same allowance. Brim spends it carefully, and you set how often it refreshes.</p>
+    <dl class="figures">
+      <div data-r><dt>1</dt><dd>request per refresh press, where the app Brim is forked from sent three.</dd></div>
+      <div data-r><dt>60s</dt><dd>between manual Claude reads, and five minutes between scheduled ones.</dd></div>
+      <div data-r><dt>20</dt><dd>reads an hour at most, leaving the rest of the allowance for Claude Code.</dd></div>
+      <div data-r><dt>0</dt><dd>requests with Live Feed on. Claude Code's status line hands Brim its limits directly.</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="ch" id="menubar" style="--bg:#FFD84D;--ink:#1F1A00" data-next="#FF9F45">
+  <div class="grid split rev">
+    <div class="panel big" data-ui data-r>
+      <div class="menubar wide-bar"><span>Claude 64%</span><span>Codex 92%</span><span>Cursor 12%</span></div>
+      <h3>Menu Bar Items</h3>
+      <div class="check"><span>Claude Session</span><i class="sw on"></i></div>
+      <div class="check"><span>Claude Weekly</span><i class="sw"></i></div>
+      <div class="check"><span>Codex Weekly</span><i class="sw on"></i></div>
+      <div class="check"><span>Cursor Monthly</span><i class="sw on"></i></div>
+    </div>
+    <div>
+      <h2 data-r>Pin what matters</h2>
+      <p class="body" data-r>Pin any limit next to the clock, or several. If you pin nothing, your session limit still shows, so the number you need most is always one look away.</p>
+    </div>
+  </div>
+</section>
+
+<section class="ch" id="looks" style="--bg:#FF9F45;--ink:#241000" data-next="#FF6B4A">
+  <div class="grid">
+    <h2 class="wide" data-r>Four looks, one glass panel</h2>
+    <p class="body lede" data-r>Native Swift with Liquid Glass. Liquid Fill is the default, and it rises and warms with your most-used limit. Reduce Motion stops the movement.</p>
+    <ul class="tiles">
+      <li data-r data-ui><div class="swatch liquidlook"><span>64%</span></div><b>Liquid Fill</b></li>
+      <li data-r data-ui><div class="swatch aurora"><span>64%</span></div><b>Aurora</b></li>
+      <li data-r data-ui><div class="swatch sunset"><span>64%</span></div><b>Sunset</b></li>
+      <li data-r data-ui><div class="swatch nolook"><span>64%</span></div><b>None</b></li>
+    </ul>
+  </div>
+</section>
+
+<section class="ch names" id="tools" style="--bg:#FF6B4A;--ink:#240700" data-next="#B3123B">
+  <h2 class="pad" data-r>Twelve tools, one app</h2>
+  <div class="run" aria-hidden="true" data-run="-1">Claude Codex Cursor Copilot Claude Codex Cursor Copilot Claude Codex</div>
+  <div class="run" aria-hidden="true" data-run="1">Antigravity Devin Grok Antigravity Devin Grok Antigravity Devin</div>
+  <div class="run" aria-hidden="true" data-run="-1">Muse Code Ollama OpenCode Muse Code Ollama OpenCode Muse Code</div>
+  <div class="run" aria-hidden="true" data-run="1">OpenRouter Z.ai OpenRouter Z.ai OpenRouter Z.ai OpenRouter Z.ai</div>
+  <p class="body pad">Works with Claude, Codex, Cursor, Copilot, Antigravity, Devin, Grok, Muse Code, Ollama, OpenCode, OpenRouter and Z.ai. You sign in inside Brim, and it keeps your credentials in its own Keychain items.</p>
+</section>
+
+<section class="ch" id="raycast" style="--bg:#B3123B;--ink:#FFF4F2" data-next="#F2F7F7">
+  <div class="grid split">
+    <div>
+      <h2 data-r>Type cc in Raycast</h2>
+      <p class="body" data-r>The Claude Usage Limits extension puts the same numbers one keystroke away, with tokens, cost and sessions next to them. It reads from Brim, so it makes no calls to Anthropic.</p>
+      <a class="btn light" href="https://github.com/tapariapurv/brim/tree/main/raycast" data-r>Get the extension</a>
+    </div>
+    <div class="panel big ray" data-ui data-r>
+      <div class="search">cc</div>
+      <div class="ray-list">
+        <div class="ray-side">
+          <span class="sel">Usage Limits</span><span>Today</span><span>This Week</span><span>This Month</span><span>Sessions</span>
+        </div>
+        <div class="ray-detail">
+          <h3>5-Hour Usage Limit</h3><div class="bar" style="--v:.28"><i></i></div><small>28% used · resets in 2h 14m</small>
+          <h3>7-Day Usage Limit</h3><div class="bar" style="--v:.61"><i></i></div><small>61% used · resets in 3d 4h</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ch" id="install" style="--bg:#F2F7F7;--ink:#03262B" data-next="#03262B">
+  <div class="grid">
+    <h2 class="wide" data-r>Open it the first time</h2>
+    <p class="body lede" data-r>Brim isn't notarized by Apple yet, so macOS asks you to confirm it once. After that it opens like any other app.</p>
+    <ol class="fields">
+      <li style="--f:#D8F3F1" data-r><b>Drag it in</b>Open Brim.dmg and drag Brim to Applications.</li>
+      <li style="--f:#7FE0DB" data-r><b>Open it</b>Open Brim from Applications. macOS says it can't verify it. Choose Done.</li>
+      <li style="--f:#FFD84D" data-r><b>Allow it</b>In System Settings, go to Privacy &amp; Security and choose Open Anyway.</li>
+      <li style="--f:#FF9F45" data-r><b>Add an account</b>Click Brim in the menu bar and sign in to the tools you use.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="ch faq" id="faq" style="--bg:#03262B;--ink:#F2FBFA" data-next="#0B9DA8">
+  <div class="grid">
+    <h2 class="wide" data-r>Questions</h2>
+    <div class="qs">
+      <details data-r><summary>Does it cost anything?</summary><p>No. Brim is free and open source under the MIT license.</p></details>
+      <details data-r><summary>Does it send my data anywhere?</summary><p>Brim has no analytics. It talks only to the providers you sign in to, to read your limits, and fetches a public price list from GitHub for its cost estimates.</p></details>
+      <details data-r><summary>Does it read my other apps' files?</summary><p>Only Claude Code's and Codex's usage logs, for the local estimates, which you can turn off. It never reads their credentials. Live Feed is opt-in and backs up your Claude Code settings before changing them.</p></details>
+      <details data-r><summary>Will it get around my provider's limits?</summary><p>No. Brim shows your limits and uses fewer requests to read them. It doesn't change what your plan allows.</p></details>
+      <details data-r><summary>Does it update itself?</summary><p>Not yet. Download new versions from GitHub Releases.</p></details>
+      <details data-r><summary>Who made it?</summary><p>Purv Taparia, as a fork of <a href="https://github.com/robinebers/openusage">OpenUsage</a> by Robin Ebers. Thanks to Robin and its contributors. The Raycast extension is a fork of <a href="https://github.com/raycast/extensions/tree/main/extensions/ccusage">ccusage for Raycast</a> by nyatinte.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="ch cta" id="download" style="--bg:#0B9DA8;--ink:#001F23">
+  <div class="grid">
+    <h2 class="huge" data-r>Then it resets</h2>
+    <p class="lead" data-r>Every limit drains back down. Know when, and plan your next long run around it.</p>
+    <div class="actions" data-r>
+      <a class="btn" href="https://github.com/tapariapurv/brim/releases/latest/download/Brim.dmg">Download for Mac</a>
+      <a class="plain" href="https://github.com/tapariapurv/brim">View the source</a>
+    </div>
+  </div>
+  <footer>
+    <div class="foot-links">
+      <span>Not affiliated with Anthropic, OpenAI or the other providers.</span>
+      <a href="https://github.com/tapariapurv/brim/releases">Releases</a>
+      <a href="https://github.com/tapariapurv/brim/blob/main/docs/privacy.md">Privacy</a>
+      <a href="https://github.com/tapariapurv/brim/blob/main/LICENSE">License</a>
+    </div>
+    <svg class="name" aria-hidden="true" viewBox="0 0 1000 330"><text x="0" y="325" font-size="430" font-weight="500" textLength="1000" lengthAdjust="spacingAndGlyphs" fill="currentColor">Brim</text></svg>
+  </footer>
+</section>
+
+</main>
+<div class="gauge" id="gauge" aria-hidden="true">0%</div>
+<script src="site.js"></script>
+</body>
+</html>

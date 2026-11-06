@@ -6,6 +6,12 @@ A native macOS menu-bar app for your AI usage limits, in Liquid Glass.
 
 ![Brim's panel](assets/brim-panel.png)
 
+## Download
+
+[Download Brim.dmg](https://github.com/tapariapurv/brim/releases/latest/download/Brim.dmg) or visit [the website](https://tapariapurv.github.io/brim/). Requires macOS 26.
+
+Brim isn't notarized yet. The first time you open it, macOS says it can't verify it: choose Done, then go to System Settings > Privacy & Security and choose Open Anyway.
+
 ## What Brim changes
 
 - **Liquid Glass throughout.** Requires macOS 26 or later.
@@ -28,6 +34,10 @@ Anthropic allows about 30 usage requests an hour per account, shared with Claude
 - If Anthropic still pauses checks, Brim keeps showing the last reading and when it will check next.
 
 **Claude Code Live Feed** (Settings > General) goes further: it adds a status line to Claude Code that saves your 5-hour and weekly limits to `~/.brim/claude-feed.json`, with no request to Anthropic. It updates while Claude Code is active, and the API is then read about every 30 minutes for the other rows. Use it with one Claude login in Brim, the same one Claude Code uses. It won't replace a status line you already have, and it backs up `settings.json` to `settings.json.brim-backup` first.
+
+## Raycast
+
+The [Claude Usage Limits](raycast/) extension shows the same limits in Raycast. Type `cc` to open it.
 
 ## Building
 
