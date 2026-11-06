@@ -25,10 +25,16 @@ const toLimit = (key: string, resource: Resource): AgentLimit | null => {
     key,
     label: labelFor(key),
     utilization: isPercent ? amount : null,
-    value: isPercent ? null : `${amount} ${resource.unit ?? ""}`.trim(),
+    value: isPercent ? null : `${Math.round(amount * 100) / 100} ${resource.unit ?? ""}`.trim(),
     resetsAt: resource.resetsAt ?? null,
     windowHours: resource.windowSeconds ? resource.windowSeconds / 3600 : null,
   };
+};
+
+/** A limit's label and value as one title: Raycast cuts a label's right-hand text to "3.." when space runs short. */
+export const limitTitle = (limit: AgentLimit): string => {
+  const value = limit.utilization === null ? limit.value : `${limit.utilization.toFixed(0)}% Used`;
+  return value ? `${limit.label} · ${value}` : limit.label;
 };
 
 /** Every account Brim has a reading for. Brim's output is keyed alphabetically, not in the user's order. */

@@ -2,7 +2,7 @@ import { List, Icon, Color, Action, ActionPanel } from "@raycast/api";
 import { getProgressIcon, useCachedPromise, useCachedState } from "@raycast/utils";
 import { Fragment, ReactNode, useEffect } from "react";
 import { getReportRefreshInterval } from "../utils/usage-report";
-import { applyAgentOrder, boldText, fetchBrimAgents, moveAgent } from "../utils/brim-agents";
+import { applyAgentOrder, boldText, fetchBrimAgents, limitTitle, moveAgent } from "../utils/brim-agents";
 import { calculateEstimatedUsage, formatResetTime } from "../utils/usage-limits-formatter";
 import { ErrorMetadata } from "./ErrorMetadata";
 
@@ -47,11 +47,10 @@ export function UsageLimits() {
               return (
                 <Fragment key={limit.key}>
                   <List.Item.Detail.Metadata.Label
-                    title={limit.label}
+                    title={limitTitle(limit)}
                     icon={
                       percent === null ? undefined : getProgressIcon(Math.min(percent, 100) / 100, levelColor(percent))
                     }
-                    text={percent === null ? (limit.value ?? "") : `${percent.toFixed(0)}% Used`}
                   />
                   {limit.resetsAt ? (
                     <List.Item.Detail.Metadata.Label title="Resets By" text={formatResetTime(limit.resetsAt)} />
