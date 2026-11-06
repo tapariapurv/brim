@@ -77,6 +77,12 @@ final class LocalUsageTests: XCTestCase {
         XCTAssertEqual(LocalUsageReader.merge(day(5, spend: 1), into: UsageHistory(calendar: utc, asOf: now)).days[start]?.totals[.tokens], 5)
     }
 
+    func testBreakdownShowsTheEstimateItsRowShows() {
+        let totals = UsageTotals(values: [.estimatedSpend: 2, .tokens: 1000])
+        let history = UsageHistory(calendar: utc, asOf: now, days: [utc.startOfDay(for: now): UsageDay(totals: totals)])
+        XCTAssertEqual(UsageBreakdown(.today, in: history).figures.count, 2)
+    }
+
     func testOnlyProvidersWithLogsAndNoSignInGetALocalCard() throws {
         let home = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
         try FileManager.default.createDirectory(at: home.appending(path: ".codex/sessions"), withIntermediateDirectories: true)

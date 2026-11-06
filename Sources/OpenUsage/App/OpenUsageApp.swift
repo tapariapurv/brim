@@ -30,6 +30,9 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
         NSApp.disableRelaunchOnLogin()
+        if Bundle.main.bundleIdentifier != APIKeyV1Files.developmentBundleIdentifier {
+            LaunchAtLoginSetting().registerOnOpen()
+        }
         AppearanceSetting.applyCurrent()
         let container = AppContainer(telemetry: NoTelemetrySink(), telemetryDefaults: TelemetryRecorder.suite, localUsage: LocalUsageReader())
         self.container = container

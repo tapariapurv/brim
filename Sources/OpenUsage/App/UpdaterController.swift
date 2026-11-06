@@ -84,6 +84,22 @@ final class UpdaterController: NSObject, SPUUpdaterDelegate, SPUStandardUserDriv
         }
     }
 
+    /// A menu-bar app rarely quits, so waiting for that would strand a downloaded update. Install now and
+    /// relaunch, unless the panel is in use: then it waits for quit, and the next check offers it again.
+    func updater(
+        _ updater: SPUUpdater,
+        willInstallUpdateOnQuit item: SUAppcastItem,
+        immediateInstallationBlock immediateInstallHandler: @escaping () -> Void
+    ) -> Bool {
+        guard NSApp.keyWindow == nil else {
+            AppLog.info(.updates, "\(item.displayVersionString) ready; panel in use, waiting")
+            return false
+        }
+        AppLog.info(.updates, "installing \(item.displayVersionString) and relaunching")
+        immediateInstallHandler()
+        return true
+    }
+
     nonisolated var supportsGentleScheduledUpdateReminders: Bool { true }
 
     /// Take over showing *scheduled* updates entirely: for a dockless app macOS would put Sparkle's

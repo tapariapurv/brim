@@ -296,7 +296,7 @@ struct UsageBreakdown: Codable, Hashable, Sendable {
     /// What the window charged, then its tokens and any spend on the user's own keys. A window that
     /// reports neither dollars nor tokens falls back to the first thing it does report.
     var figures: [String] {
-        let charged = Self.dollarMeasures.first { totals[$0] != nil }
+        let charged = (Self.dollarMeasures + [.estimatedSpend]).first { totals[$0] != nil }
         let shown = [charged, .tokens, .byokSpend].compactMap(\.self).filter { measure in
             guard let number = totals[measure] else { return false }
             return measure != .byokSpend || number > 0

@@ -90,6 +90,49 @@ final class LaunchAtLoginSettingTests: XCTestCase {
         XCTAssertFalse(invalidated.withLock { $0 })
     }
 
+    func testOpeningRegistersUntilTurnedOffAndAgainAfterTurnedBackOn() throws {
+        let suite = "LaunchAtLoginSettingTests.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        var systemEnabled = false
+        func makeSetting() -> LaunchAtLoginSetting {
+            LaunchAtLoginSetting(
+                currentStatus: { systemEnabled },
+                setEnabled: { systemEnabled = $0 },
+                canRegister: { !systemEnabled },
+                defaults: defaults
+            )
+        }
+
+        makeSetting().registerOnOpen()
+        XCTAssertTrue(systemEnabled)
+
+        makeSetting().update(to: false)
+        makeSetting().registerOnOpen()
+        XCTAssertFalse(systemEnabled)
+
+        makeSetting().update(to: true)
+        systemEnabled = false
+        makeSetting().registerOnOpen()
+        XCTAssertTrue(systemEnabled)
+    }
+
+    func testOpeningLeavesALoginItemTurnedOffInSystemSettings() throws {
+        let suite = "LaunchAtLoginSettingTests.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let setting = LaunchAtLoginSetting(
+            currentStatus: { false },
+            setEnabled: { _ in XCTFail("Must not register against the user's System Settings choice") },
+            canRegister: { false },
+            defaults: defaults
+        )
+
+        setting.registerOnOpen()
+
+        XCTAssertNil(setting.errorMessage)
+    }
+
     private enum TestError: Error {
         case rejected
     }

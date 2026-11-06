@@ -5,7 +5,8 @@ Alerts, and Advanced. Changes apply at once. Hover the ⓘ beside a setting to s
 
 ## General
 
-- **Launch at Login.** Starts Brim when you sign in to your Mac.
+- **Launch at Login.** Starts Brim when you sign in to your Mac. Brim turns this on each time you
+  open it, unless you turned it off here or in System Settings. Development builds never turn it on.
 - **Default Tab.** Priority or All Usage, the tab the panel opens to.
 - **Global Shortcut.** Opens and closes the panel from any app. Click the field and press the keys.
 
