@@ -1,33 +1,30 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "ccusage-brim",
-  "title": "CC Usage (Brim)",
-  "description": "Claude Code usage and limits. Limits come from Brim, with no calls to Anthropic. Fork of ccusage by nyatinte.",
+  "name": "claude-usage-limits",
+  "title": "Claude Usage Limits",
+  "description": "See Claude Code and Codex usage limits, reset times and cost at a glance. Reads from the free Brim app, so it never uses up your Anthropic rate limit.",
   "categories": [
     "Developer Tools"
   ],
   "icon": "extension-icon.png",
-  "author": "tapariapurv",
-  "contributors": [
-    "bohdan_zhuravel",
-    "zzyfisher",
-    "garrick_zhang",
-    "pernielsentikaer",
-    "raulg",
-    "ridemountainpig",
-    "bendrucker",
-    "zeev",
-    "Astatine-213"
-  ],
+  "author": "purv_taparia",
   "license": "MIT",
   "commands": [
     {
       "name": "ccusage",
-      "title": "CC Usage",
-      "subtitle": "ccusage",
-      "description": "Monitor Claude Code usage with real-time tracking",
+      "title": "Claude Code Usage",
+      "subtitle": "Brim",
+      "description": "Usage limits, reset times, tokens and cost for Claude Code",
       "mode": "view",
       "preferences": [
+        {
+          "name": "showUsageLimits",
+          "type": "checkbox",
+          "required": false,
+          "label": "Show Usage Limits",
+          "description": "5-hour, weekly and per-model limits from Brim.",
+          "default": true
+        },
         {
           "name": "showToday",
           "type": "checkbox",
@@ -75,21 +72,27 @@
           "label": "Show Models",
           "description": "Tokens and costs by model.",
           "default": true
-        },
-        {
-          "name": "showUsageLimits",
-          "type": "checkbox",
-          "required": false,
-          "label": "Show Usage Limits",
-          "description": "Claude OAuth usage limits.",
-          "default": true
         }
+      ],
+      "keywords": [
+        "cc",
+        "ccusage",
+        "claude",
+        "claude code",
+        "codex",
+        "usage",
+        "limits",
+        "rate limit",
+        "session limit",
+        "tokens",
+        "cost",
+        "brim"
       ]
     },
     {
       "name": "menubar-ccusage",
       "title": "Claude Usage in Menu Bar",
-      "subtitle": "ccusage",
+      "subtitle": "Brim",
       "description": "Show Claude Code usage in menu bar",
       "mode": "menu-bar",
       "interval": "5m",
@@ -175,35 +178,35 @@
           "default": "solid",
           "data": [
             {
-              "title": "Solid (\u2588\u2591)",
+              "title": "Solid (█░)",
               "value": "solid"
             },
             {
-              "title": "Dots (\u25cf\u25cb)",
+              "title": "Dots (●○)",
               "value": "dots"
             },
             {
-              "title": "Segmented (\u25ae\u25af)",
+              "title": "Segmented (▮▯)",
               "value": "segmented"
             },
             {
-              "title": "Squares (\u25a0\u25a1)",
+              "title": "Squares (■□)",
               "value": "squares"
             },
             {
-              "title": "Diamonds (\u25c6\u25c7)",
+              "title": "Diamonds (◆◇)",
               "value": "diamonds"
             },
             {
-              "title": "Stars (\u2605\u2606)",
+              "title": "Stars (★☆)",
               "value": "stars"
             },
             {
-              "title": "Braille (\u28ff\u28c0)",
+              "title": "Braille (⣿⣀)",
               "value": "braille"
             },
             {
-              "title": "Blocks (\u25b0\u25b1)",
+              "title": "Blocks (▰▱)",
               "value": "blocks"
             },
             {
@@ -211,7 +214,7 @@
               "value": "ascii"
             },
             {
-              "title": "Pies (\u25d4)",
+              "title": "Pies (◔)",
               "value": "pies"
             }
           ]
@@ -229,7 +232,7 @@
           "type": "textfield",
           "required": false,
           "title": "Time Remaining Format",
-          "description": "Format string for time remaining. Placeholders: {h} hours, {m} minutes, {M} total minutes, {h.f} fractional hours. Example: {h}h{m}m \u2192 1h23m",
+          "description": "Format string for time remaining. Placeholders: {h} hours, {m} minutes, {M} total minutes, {h.f} fractional hours. Example: {h}h{m}m → 1h23m",
           "default": "{h}h{m}m",
           "placeholder": "e.g., {h}h{m}m or {M}m or {h.f}h"
         },
@@ -294,7 +297,7 @@
     {
       "name": "claude-code-stats",
       "title": "Claude Code Stats",
-      "subtitle": "ccusage",
+      "subtitle": "Brim",
       "description": "Update command subtitle with Claude Code usage data",
       "mode": "no-view",
       "interval": "5m",
@@ -306,7 +309,7 @@
           "title": "Subtitle Template",
           "description": "Template for the subtitle. Available placeholders: {dailyCost}, {dailyTokens}, {dailyInputTokens}, {dailyOutputTokens}, {dailyRatio}, {monthlyCost}, {monthlyTokens}, {monthlyRatio}, {usageLimit}",
           "default": "Today: {dailyCost}",
-          "placeholder": "e.g. Today: {dailyCost} \u00b7 Month: {monthlyCost}"
+          "placeholder": "e.g. Today: {dailyCost} · Month: {monthlyCost}"
         }
       ]
     }

@@ -82,7 +82,6 @@ const fetchMonthlyData = async () => {
 };
 
 const fetchUsageLimit = async () => {
-
   const result = await fetchClaudeUsageLimits();
   if (result.status !== "ok") return null;
 

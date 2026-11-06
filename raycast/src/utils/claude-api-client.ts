@@ -22,7 +22,9 @@ const OPEN_BRIM = "Open Brim and add your Claude account.";
 
 const runHelper = (path: string) =>
   new Promise<{ code: number | string | null; stdout: string }>((resolve) => {
-    execFile(path, ["claude"], { timeout: 5000 }, (error, stdout) => resolve({ code: error ? (error.code ?? 1) : 0, stdout }));
+    execFile(path, ["claude"], { timeout: 5000 }, (error, stdout) =>
+      resolve({ code: error ? (error.code ?? 1) : 0, stdout }),
+    );
   });
 
 const claudeWindow = (resource?: BrimResource) =>

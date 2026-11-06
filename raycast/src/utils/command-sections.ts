@@ -1,11 +1,11 @@
 export const COMMAND_SECTIONS = [
+  { preference: "showUsageLimits", view: "usage-limits", id: "usage-limits" },
   { preference: "showToday", view: "today", id: "today" },
   { preference: "showThisWeek", view: "week", id: "week" },
   { preference: "showThisMonth", view: "month", id: "month" },
   { preference: "showSessions", view: "session", id: "sessions" },
   { preference: "showCosts", view: "cost", id: "cost-analysis" },
   { preference: "showModels", view: "model", id: "model-breakdown" },
-  { preference: "showUsageLimits", view: "usage-limits", id: "usage-limits" },
 ] as const;
 
 export type CommandSection = (typeof COMMAND_SECTIONS)[number];

@@ -24,8 +24,6 @@ export default async function getUsageLimits(input?: Input): Promise<{
   sevenDay: LimitWindowSummary | null;
   scopedLimits?: Array<LimitWindowSummary & { label: string; period: string }>;
 }> {
-
-
   const result = await fetchClaudeUsageLimits();
 
   if (result.status === "rate_limited") {

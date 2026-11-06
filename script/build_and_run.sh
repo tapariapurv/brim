@@ -23,8 +23,8 @@ MIN_SYSTEM_VERSION="26.0"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # The dev build is labelled by its commit ("dev (abc1234)" in the footer and About panel), so it never
-# carries a stale release number. Releases take their version from the tag; see script/release.sh.
-APP_VERSION="dev ($(git -C "$ROOT_DIR" rev-parse --short HEAD))"
+# carries a stale release number. Releases take their version from the tag; see script/make_dmg.sh.
+APP_VERSION="${APP_VERSION:-dev ($(git -C "$ROOT_DIR" rev-parse --short HEAD))}"
 APP_BUILD="$(git -C "$ROOT_DIR" rev-list --count HEAD)"
 DIST_DIR="$ROOT_DIR/dist"
 APP_BUNDLE="$DIST_DIR/$APP_DISPLAY.app"
@@ -35,7 +35,7 @@ APP_RESOURCES="$APP_CONTENTS/Resources"
 APP_BINARY="$APP_MACOS/$TARGET_NAME"
 CLI_BINARY="$APP_HELPERS/brim"
 INFO_PLIST="$APP_CONTENTS/Info.plist"
-SIGN_ENTITLEMENTS="$ROOT_DIR/script/Brim.local.entitlements.plist"
+SIGN_ENTITLEMENTS="${SIGN_ENTITLEMENTS:-$ROOT_DIR/script/Brim.local.entitlements.plist}"
 
 # Stop only the dev build staged here, never an installed OpenUsage with the same executable name.
 pkill -f "^$APP_BINARY" >/dev/null 2>&1 || true

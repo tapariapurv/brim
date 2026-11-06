@@ -1,19 +1,18 @@
-import { List, Icon, Color, Action, ActionPanel } from "@raycast/api";
+import { List, Icon, Action, ActionPanel } from "@raycast/api";
 import { useClaudeUsageLimits } from "../hooks/useClaudeUsageLimits";
 import {
   formatTimeRemaining,
   formatRelativeTime,
-  getUtilizationColor,
   calculateEstimatedUsage,
   calculateAverageUsage,
-  createProgressBar,
 } from "../utils/usage-limits-formatter";
 import { formatDuration } from "../utils/data-formatter";
 import { getLimitRows } from "../utils/limit-rows";
+import { limitBar } from "../utils/limit-bar";
 import { showRemainingUsage } from "../preferences";
 import { ErrorMetadata } from "./ErrorMetadata";
 import { STANDARD_ACCESSORIES } from "./common/accessories";
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { capitalize } from "es-toolkit";
 
 const rowTitle = (label: string, period: string | null): string =>
@@ -74,98 +73,46 @@ export function UsageLimits() {
     if (isRateLimited && !data) {
       return (
         <ErrorMetadata
-          noDataMessage={
-            rateLimitRetryIn ? `Rate limited — retry in ${rateLimitRetryIn}` : "Rate limited by Anthropic API"
-          }
+          noDataMessage={rateLimitRetryIn ? `Rate limited — retry in ${rateLimitRetryIn}` : "Rate limited"}
           noDataSubMessage="Click Refresh to try now"
         />
       );
     }
 
     if (!data) {
-      return <ErrorMetadata noDataMessage="Loading usage limits..." noDataSubMessage="Fetching data from Claude API" />;
+      return <ErrorMetadata noDataMessage="Loading usage limits..." noDataSubMessage="Reading from Brim" />;
     }
 
-    return (
-      <List.Item.Detail.Metadata>
-        {lastFetched && (
-          <>
-            <List.Item.Detail.Metadata.Label
-              title="Data Updated At"
-              text={lastFetched.toLocaleString()}
-              icon={{ source: Icon.Clock, tintColor: Color.Blue }}
-            />
-            <List.Item.Detail.Metadata.Separator />
-          </>
-        )}
+    return undefined;
+  };
 
-        {getLimitRows(data).map((row, index) => {
-          const average = row.windowHours === null ? null : calculateAverageUsage(row.resets_at, row.windowHours);
-          const estimate =
-            row.windowHours === null ? null : calculateEstimatedUsage(row.utilization, row.resets_at, row.windowHours);
+  const renderMarkdown = (): string | undefined => {
+    if (!data) return undefined;
 
-          return (
-            <React.Fragment key={row.key}>
-              {index > 0 && <List.Item.Detail.Metadata.Separator />}
-              <List.Item.Detail.Metadata.Label
-                title={rowTitle(row.label, row.period)}
-                icon={row.windowHours !== null && row.windowHours <= 24 ? Icon.Clock : Icon.Calendar}
-              />
-              <List.Item.Detail.Metadata.Label
-                title="Utilization"
-                text={`${row.utilization.toFixed(row.decimals)}%`}
-                icon={{ source: Icon.BarChart, tintColor: getUtilizationColor(row.utilization) }}
-              />
-              <List.Item.Detail.Metadata.Label title="Progress" text={createProgressBar(row.utilization)} />
-              {average !== null && (
-                <List.Item.Detail.Metadata.Label
-                  title="Average Usage"
-                  text={`${average.toFixed(1)}%`}
-                  icon={{ source: Icon.Circle, tintColor: Color.SecondaryText }}
-                />
-              )}
-              {estimate !== null && (
-                <List.Item.Detail.Metadata.Label
-                  title="Estimated Usage"
-                  text={`${estimate.toFixed(1)}%`}
-                  icon={{ source: Icon.LineChart, tintColor: getUtilizationColor(estimate) }}
-                />
-              )}
-              <List.Item.Detail.Metadata.Label
-                title="Resets in"
-                text={
-                  row.resets_at
-                    ? `${formatTimeRemaining(row.resets_at)} · ${new Date(row.resets_at).toLocaleString("en-US", { hour12: false })}`
-                    : "N/A"
-                }
-                icon={Icon.ArrowClockwise}
-              />
-            </React.Fragment>
-          );
-        })}
+    const rows = getLimitRows(data).map((row) => {
+      const average = row.windowHours === null ? null : calculateAverageUsage(row.resets_at, row.windowHours);
+      const estimate =
+        row.windowHours === null ? null : calculateEstimatedUsage(row.utilization, row.resets_at, row.windowHours);
+      const facts = [
+        `**${row.utilization.toFixed(0)}%** used`,
+        row.resets_at ? `resets in ${formatTimeRemaining(row.resets_at)}` : null,
+        estimate === null ? null : `on pace for ${estimate.toFixed(0)}%`,
+      ].filter(Boolean);
 
-        {isStale && !isLoading && (
-          <>
-            <List.Item.Detail.Metadata.Separator />
-            <List.Item.Detail.Metadata.Label
-              title="Warning"
-              text="Data may be stale"
-              icon={{ source: Icon.Warning, tintColor: Color.Yellow }}
-            />
-            <List.Item.Detail.Metadata.Label title="Last Updated" text={formatRelativeTime(lastFetched)} />
-          </>
-        )}
-      </List.Item.Detail.Metadata>
-    );
+      return `#### ${rowTitle(row.label, row.period)}\n\n![](${limitBar(row.utilization, average)})\n\n${facts.join(" · ")}`;
+    });
+
+    const footer = lastFetched ? `Updated ${formatRelativeTime(lastFetched)}${isStale ? " · may be stale" : ""}` : "";
+    return [...rows, footer].filter(Boolean).join("\n\n");
   };
 
   return (
     <List.Item
       id="usage-limits"
       title="Usage Limits"
-      icon={{ source: Icon.Gauge, tintColor: Color.SecondaryText }}
+      icon={Icon.Gauge}
       accessories={accessories}
-      detail={<List.Item.Detail isLoading={isLoading} metadata={renderDetailMetadata()} />}
+      detail={<List.Item.Detail isLoading={isLoading} markdown={renderMarkdown()} metadata={renderDetailMetadata()} />}
       actions={
         <ActionPanel>
           <Action title="Refresh Usage Limit" icon={Icon.ArrowClockwise} onAction={revalidate} />

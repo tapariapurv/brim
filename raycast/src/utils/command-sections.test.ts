@@ -2,16 +2,16 @@ import { COMMAND_SECTIONS, getCommandConfiguration } from "./command-sections";
 
 const hidden = Object.fromEntries(COMMAND_SECTIONS.map(({ preference }) => [preference, false]));
 
-it("places This Month after This Week and retains existing defaults", () => {
+it("puts Usage Limits first and This Month after This Week", () => {
   const config = getCommandConfiguration({});
   expect(config.sections.map(({ view }) => view)).toEqual([
+    "usage-limits",
     "today",
     "week",
     "month",
     "session",
     "cost",
     "model",
-    "usage-limits",
   ]);
   expect(config.summarySections).toEqual(["daily", "weekly", "monthly"]);
 });
