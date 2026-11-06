@@ -136,7 +136,8 @@ struct PriorityBoardList: View {
             if board.attention.isEmpty { clearRow }
             ForEach(board.attention) { item in
                 limitRow(item.provider, item.data, severity: item.reason.severity,
-                         callout: item.runOutText(now: now).map { ($0, Theme.severityTextColor(.warning)) })
+                         callout: item.runOutText(now: now).map { ($0, Theme.severityTextColor(.warning)) },
+                         calloutReset: item.runOutResetText(now: now))
                     .padding(.horizontal, 4)
                     .contentShape(Rectangle())
                     .contextMenu { pinMenu(item.id, pinned: item.isPinned) }
@@ -197,10 +198,11 @@ struct PriorityBoardList: View {
         }
     }
 
-    /// `callout` takes the reset's place: when a limit listed only for burning fast runs out, or when one listed to
-    /// use it or lose it resets.
+    /// `callout` says when a limit listed only for burning fast runs out, beside its reset, or when one listed to
+    /// use it or lose it resets, in the reset's place.
     private func limitRow(
-        _ provider: Provider, _ data: WidgetData, severity: WidgetData.MeterSeverity, callout: (text: String, color: Color)? = nil
+        _ provider: Provider, _ data: WidgetData, severity: WidgetData.MeterSeverity, callout: (text: String, color: Color)? = nil,
+        calloutReset: String? = nil
     ) -> some View {
         HStack(spacing: 10) {
             PriorityGauge(fraction: data.fraction, severity: severity, icon: provider.icon, paceMark: data.paceMark(now: now))
@@ -222,10 +224,20 @@ struct PriorityBoardList: View {
                         .monospacedDigit()
                 }
                 if let callout {
-                    Text(callout.text)
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(callout.color)
-                        .monospacedDigit()
+                    HStack(spacing: 0) {
+                        Text(callout.text)
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(callout.color)
+                            .monospacedDigit()
+                        if let calloutReset {
+                            toggling(onToggleResetDisplay) {
+                                Text(" · \(calloutReset)")
+                                    .font(.system(size: 11))
+                                    .foregroundStyle(.secondary)
+                                    .monospacedDigit()
+                            }
+                        }
+                    }
                 } else if let reset = data.compactResetText(now: now) {
                     toggling(onToggleResetDisplay) {
                         Text(reset)

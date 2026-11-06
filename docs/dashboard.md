@@ -17,7 +17,7 @@ Priority shows only what needs you, most urgent first.
 - **Running Out** lists every limit at or under its Warning level (30% left by default, set in
   [Settings → Display → Priority](settings.md#priority)). With **Burning Fast** on, it also lists a
   limit that would run out before it resets at your current pace, however much it has left, with the
-  time it would run out, like `Out in 1h 8m`, in place of its reset. It stays listed until its pace eases to
+  time it would run out beside its reset, like `Out in 1h 8m · Resets 4h 31m`. It stays listed until its pace eases to
   90% of the limit. What would run out soonest at your current pace comes first, then limits with no
   pace, least left first.
 - **Use It or Lose It** lists, with the setting of that name on, a limit that resets within 24 hours

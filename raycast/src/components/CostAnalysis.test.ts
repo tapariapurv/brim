@@ -7,7 +7,7 @@ jest.mock("../hooks/useTotalUsage", () => ({ useTotalUsage: jest.fn() }));
 jest.mock("../hooks/useDailyUsage", () => ({ useDailyUsage: jest.fn() }));
 jest.mock("../hooks/useSessionUsage", () => ({ useSessionUsage: jest.fn() }));
 jest.mock("./common/StandardActions", () => ({ StandardActions: "Actions" }));
-jest.mock("react", () => ({ useMemo: (read: () => unknown) => read() }), { virtual: true });
+jest.mock("react", () => ({ ...jest.requireActual("react"), useMemo: (read: () => unknown) => read() }));
 jest.mock(
   "react/jsx-runtime",
   () => ({

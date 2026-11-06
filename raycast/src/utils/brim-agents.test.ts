@@ -14,6 +14,17 @@ describe("brim agents", () => {
     expect(codex.limits[0]).toMatchObject({ label: "Credits", utilization: null, value: "821 credits" });
   });
 
+  it("hides only an untouched Antigravity window's moving reset", () => {
+    const resetsAt = "2026-11-06T17:08:48.000Z";
+    const session = (used: number) => ({ resources: { session: { unit: "percent", used, resetsAt } } });
+    const resets = parseBrimAgents(
+      JSON.stringify({
+        providers: { "antigravity@1": session(0), "antigravity@2": session(4), "claude@1": session(0) },
+      }),
+    ).map((agent) => agent.limits[0].resetsAt);
+    expect(resets).toEqual([null, resetsAt, resetsAt]);
+  });
+
   it("rounds non-percent values to two decimals", () => {
     const [agent] = parseBrimAgents(
       JSON.stringify({ providers: { "x@1": { resources: { extraUsageSpent: { unit: "usd", used: 12.3456 } } } } }),

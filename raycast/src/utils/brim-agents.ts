@@ -17,16 +17,18 @@ type Account = { displayName?: string; plan?: string; stale?: boolean; resources
 
 const labelFor = (key: string) => key.replace(/([A-Z])/g, " $1").replace(/^./, (first) => first.toUpperCase());
 
-const toLimit = (key: string, resource: Resource): AgentLimit | null => {
+const toLimit = (accountId: string, key: string, resource: Resource): AgentLimit | null => {
   const amount = resource.used ?? resource.available;
   if (typeof amount !== "number") return null;
   const isPercent = resource.unit === "percent";
+  // Antigravity reports a reset that keeps moving until a window is first used. Brim hides it too.
+  const hasRealReset = !(accountId.startsWith("antigravity@") && amount === 0);
   return {
     key,
     label: labelFor(key),
     utilization: isPercent ? amount : null,
     value: isPercent ? null : `${Math.round(amount * 100) / 100} ${resource.unit ?? ""}`.trim(),
-    resetsAt: resource.resetsAt ?? null,
+    resetsAt: hasRealReset ? (resource.resetsAt ?? null) : null,
     windowHours: resource.windowSeconds ? resource.windowSeconds / 3600 : null,
   };
 };
@@ -39,7 +41,7 @@ export const parseBrimAgents = (output: string): BrimAgent[] => {
     name: account.displayName ?? id,
     plan: account.plan ?? null,
     stale: account.stale === true,
-    limits: Object.entries(account.resources ?? {}).flatMap(([key, resource]) => toLimit(key, resource) ?? []),
+    limits: Object.entries(account.resources ?? {}).flatMap(([key, resource]) => toLimit(id, key, resource) ?? []),
   }));
 };
 

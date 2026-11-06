@@ -48,6 +48,8 @@ final class BurningFastTests: XCTestCase {
         XCTAssertEqual(board.attention.map(\.reason.severity), [.normal, .warning, .normal, .warning], "the ring keeps meaning what's left")
         XCTAssertEqual(board.attention.map { $0.runOutText(now: now) }, ["Out in 1h 8m", nil, "Out in 2d 12h", nil],
                        "only a limit listed for burning fast says when it runs out")
+        XCTAssertEqual(board.attention.map { $0.runOutResetText(now: now) }, ["Resets 4h 35m", nil, "Resets 6d 18h", nil],
+                       "the estimate never hides when the limit really resets")
         XCTAssertEqual(MenuBarContentBuilder.build(board: board, limit: .upToTwo).items.map(\.id), ["claude@1.Session", "claude@1.Weekly"])
 
         let off = PriorityBoard.make(accounts: accounts, burningFast: nil, now: now)

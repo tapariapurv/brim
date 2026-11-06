@@ -76,13 +76,19 @@ struct PriorityItem: Identifiable {
     var id: String { line.id }
     var data: WidgetData { line.data }
 
-    /// The line under the amount of a limit listed only for burning fast, in place of its reset. A limit still
-    /// listed while its pace eases would run out after its reset, so it shows the reset instead.
+    /// The line under the amount of a limit listed only for burning fast, beside its reset. A limit still
+    /// listed while its pace eases would run out after its reset, so it shows just the reset instead.
     func runOutText(now: Date) -> String? {
         guard case .burningFast(let runway) = reason, let resetsAt = data.resetsAt,
               runway < resetsAt.timeIntervalSince(now), let duration = Formatters.compactDuration(runway)
         else { return nil }
         return "Out in \(duration)"
+    }
+
+    /// The reset beside `runOutText`, so an estimate never hides when the limit really resets.
+    func runOutResetText(now: Date) -> String? {
+        guard runOutText(now: now) != nil, let reset = data.compactResetText(now: now) else { return nil }
+        return "Resets \(reset)"
     }
 
     /// The line under the amount of a limit listed to use before it resets, in place of its reset.
