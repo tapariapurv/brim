@@ -39,8 +39,8 @@ export function ModelBreakdown() {
       : models.length === 0 && isLoading
         ? STANDARD_ACCESSORIES.LOADING
         : !models || models.length === 0
-          ? [{ text: "No models", icon: Icon.Circle }]
-          : [{ text: `${models.length} models`, icon: Icon.BarChart }];
+          ? [{ text: "No models" }]
+          : [{ text: `${models.length} models` }];
   const renderDetailMetadata = (): ReactNode => {
     const errorMetadata = ErrorMetadata({
       error: models.length === 0 ? error : undefined,
@@ -61,14 +61,6 @@ export function ModelBreakdown() {
     return (
       <List.Item.Detail.Metadata>
         {error && <List.Item.Detail.Metadata.Label title="Refresh Error" text={error.message} />}
-        <List.Item.Detail.Metadata.Label
-          title="Model Overview"
-          text={`${models.length} models used`}
-          icon={Icon.BarChart}
-        />
-        <List.Item.Detail.Metadata.Separator />
-
-        <List.Item.Detail.Metadata.Label title="Usage Distribution" />
         <List.Item.Detail.Metadata.Label title="Total Tokens" text={formatTokens(totalTokens)} />
         <List.Item.Detail.Metadata.Label title="Total Cost" text={formatCost(totalCost)} />
         <List.Item.Detail.Metadata.Label title="Total Sessions" text={totalSessions.toString()} />
@@ -76,11 +68,9 @@ export function ModelBreakdown() {
 
         {mostEfficientModel && (
           <>
-            <List.Item.Detail.Metadata.Label title="Efficiency Analysis" />
             <List.Item.Detail.Metadata.Label
               title="Most Efficient Model"
               text={mostEfficientModel.model || "Unknown Model"}
-              icon={Icon.Star}
             />
             <List.Item.Detail.Metadata.Label
               title="Cost per MTok"
@@ -103,7 +93,6 @@ export function ModelBreakdown() {
                       key={`${tier}-${model.model || "unknown"}-${index}`}
                       title={model.model || "Unknown Model"}
                       text={`${formatTokens(model.totalTokens)} (${percentage}) • ${formatCost(model.totalCost)} • ${model.sessionCount} sessions`}
-                      icon={Icon.Star}
                     />
                   );
                 })}
@@ -121,7 +110,6 @@ export function ModelBreakdown() {
               key={`top-${model.model || "unknown"}-${index}`}
               title={`${index + 1}. ${model.model || "Unknown Model"}`}
               text={`${formatTokens(model.totalTokens)} • ${formatCost(model.totalCost)} • ${costPerMTok}`}
-              icon={Icon.Star}
             />
           );
         })}

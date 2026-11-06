@@ -1,22 +1,16 @@
-import { List, Icon, Action, ActionPanel } from "@raycast/api";
+import { List, Icon, Color, Action, ActionPanel } from "@raycast/api";
+import { getProgressIcon } from "@raycast/utils";
 import { useClaudeUsageLimits } from "../hooks/useClaudeUsageLimits";
-import {
-  formatTimeRemaining,
-  formatRelativeTime,
-  calculateEstimatedUsage,
-  calculateAverageUsage,
-} from "../utils/usage-limits-formatter";
+import { formatTimeRemaining, formatRelativeTime, calculateEstimatedUsage } from "../utils/usage-limits-formatter";
 import { formatDuration } from "../utils/data-formatter";
 import { getLimitRows } from "../utils/limit-rows";
-import { limitBar } from "../utils/limit-bar";
 import { showRemainingUsage } from "../preferences";
 import { ErrorMetadata } from "./ErrorMetadata";
 import { STANDARD_ACCESSORIES } from "./common/accessories";
-import { ReactNode } from "react";
+import { Fragment, ReactNode } from "react";
 import { capitalize } from "es-toolkit";
 
-const rowTitle = (label: string, period: string | null): string =>
-  period ? `${label} ${capitalize(period)} Limit` : `${label} Usage Limit`;
+const rowName = (label: string, period: string | null): string => (period ? `${label} ${capitalize(period)}` : label);
 
 export function UsageLimits() {
   const {
@@ -38,7 +32,8 @@ export function UsageLimits() {
     return null;
   }
 
-  const [primaryRow] = getLimitRows(data);
+  const rows = getLimitRows(data);
+  const [primaryRow] = rows;
   const preferRemaining = showRemainingUsage();
 
   const accessories: List.Item.Accessory[] =
@@ -59,9 +54,8 @@ export function UsageLimits() {
               ? STANDARD_ACCESSORIES.NO_DATA
               : [
                   {
-                    icon: Icon.Gauge,
                     text: `${(preferRemaining ? 100 - primaryRow.utilization : primaryRow.utilization).toFixed(0)}%`,
-                    tooltip: `${rowTitle(primaryRow.label, primaryRow.period)} · ${preferRemaining ? "Remaining" : "Consumed"} (higher priority)`,
+                    tooltip: `${`${rowName(primaryRow.label, primaryRow.period)} Limit`} · ${preferRemaining ? "Remaining" : "Consumed"} (higher priority)`,
                   },
                 ];
 
@@ -83,27 +77,43 @@ export function UsageLimits() {
       return <ErrorMetadata noDataMessage="Loading usage limits..." noDataSubMessage="Reading from Brim" />;
     }
 
-    return undefined;
-  };
-
-  const renderMarkdown = (): string | undefined => {
-    if (!data) return undefined;
-
-    const rows = getLimitRows(data).map((row) => {
-      const average = row.windowHours === null ? null : calculateAverageUsage(row.resets_at, row.windowHours);
-      const estimate =
-        row.windowHours === null ? null : calculateEstimatedUsage(row.utilization, row.resets_at, row.windowHours);
-      const facts = [
-        `**${row.utilization.toFixed(0)}%** used`,
-        row.resets_at ? `resets in ${formatTimeRemaining(row.resets_at)}` : null,
-        estimate === null ? null : `on pace for ${estimate.toFixed(0)}%`,
-      ].filter(Boolean);
-
-      return `#### ${rowTitle(row.label, row.period)}\n\n![](${limitBar(row.utilization, average)})\n\n${facts.join(" · ")}`;
-    });
-
-    const footer = lastFetched ? `Updated ${formatRelativeTime(lastFetched)}${isStale ? " · may be stale" : ""}` : "";
-    return [...rows, footer].filter(Boolean).join("\n\n");
+    return (
+      <List.Item.Detail.Metadata>
+        {rows.map((row) => {
+          const estimate =
+            row.windowHours === null ? null : calculateEstimatedUsage(row.utilization, row.resets_at, row.windowHours);
+          const name = rowName(row.label, row.period);
+          const level = row.utilization >= 90 ? Color.Red : row.utilization >= 70 ? Color.Orange : Color.Green;
+          return (
+            <Fragment key={name}>
+              <List.Item.Detail.Metadata.Label
+                title={`${name} Limit`}
+                icon={getProgressIcon(Math.min(row.utilization, 100) / 100, level)}
+                text={`${row.utilization.toFixed(0)}% Used`}
+              />
+              {row.resets_at ? (
+                <List.Item.Detail.Metadata.Label title="Resets In" text={formatTimeRemaining(row.resets_at)} />
+              ) : null}
+              {estimate === null ? null : (
+                <List.Item.Detail.Metadata.TagList title="On Pace For">
+                  <List.Item.Detail.Metadata.TagList.Item
+                    text={`${estimate.toFixed(0)}%`}
+                    color={estimate >= 90 ? Color.Red : estimate >= 70 ? Color.Orange : Color.Green}
+                  />
+                </List.Item.Detail.Metadata.TagList>
+              )}
+              <List.Item.Detail.Metadata.Separator />
+            </Fragment>
+          );
+        })}
+        {lastFetched ? (
+          <List.Item.Detail.Metadata.Label
+            title="Updated"
+            text={`${formatRelativeTime(lastFetched)}${isStale ? " · May Be Stale" : ""}`}
+          />
+        ) : null}
+      </List.Item.Detail.Metadata>
+    );
   };
 
   return (
@@ -112,10 +122,10 @@ export function UsageLimits() {
       title="Usage Limits"
       icon={Icon.Gauge}
       accessories={accessories}
-      detail={<List.Item.Detail isLoading={isLoading} markdown={renderMarkdown()} metadata={renderDetailMetadata()} />}
+      detail={<List.Item.Detail isLoading={isLoading} metadata={renderDetailMetadata()} />}
       actions={
         <ActionPanel>
-          <Action title="Refresh Usage Limit" icon={Icon.ArrowClockwise} onAction={revalidate} />
+          <Action title="Refresh Usage Limits" icon={Icon.ArrowClockwise} onAction={revalidate} />
         </ActionPanel>
       }
     />

@@ -36,7 +36,7 @@ export function WeeklyUsage() {
         ? isLoading
           ? STANDARD_ACCESSORIES.LOADING
           : STANDARD_ACCESSORIES.NO_DATA
-        : [{ text: formatCost(weeklyUsage.totalCost), icon: Icon.Coins }];
+        : [{ text: formatCost(weeklyUsage.totalCost) }];
 
   const renderDetailMetadata = (): ReactNode => {
     if (!weeklyUsage) {
@@ -46,40 +46,26 @@ export function WeeklyUsage() {
     return (
       <List.Item.Detail.Metadata>
         {error && <List.Item.Detail.Metadata.Label title="Refresh Error" text={error.message} />}
-        <List.Item.Detail.Metadata.Label title="Week of" text={weeklyUsage.week} icon={Icon.Calendar} />
+        <List.Item.Detail.Metadata.Label title="Week of" text={weeklyUsage.week} />
         {weeklyUsage.metadata?.agents && weeklyUsage.metadata.agents.length > 1 && (
-          <List.Item.Detail.Metadata.Label
-            title="Agents"
-            text={weeklyUsage.metadata.agents.join(", ")}
-            icon={Icon.PersonCircle}
-          />
+          <List.Item.Detail.Metadata.Label title="Agents" text={weeklyUsage.metadata.agents.join(", ")} />
         )}
         <List.Item.Detail.Metadata.Separator />
-
-        <List.Item.Detail.Metadata.Label title="Token Usage" />
         <List.Item.Detail.Metadata.Label title="Input Tokens" text={formatTokens(weeklyUsage.inputTokens)} />
         <List.Item.Detail.Metadata.Label title="Output Tokens" text={formatTokens(weeklyUsage.outputTokens)} />
         <List.Item.Detail.Metadata.Label title="Total Tokens" text={formatTokens(weeklyUsage.totalTokens)} />
         <List.Item.Detail.Metadata.Separator />
-
-        <List.Item.Detail.Metadata.Label title="Cost Analysis" />
-        <List.Item.Detail.Metadata.Label
-          title="Total Cost"
-          text={formatCost(weeklyUsage.totalCost)}
-          icon={Icon.Coins}
-        />
+        <List.Item.Detail.Metadata.Label title="Total Cost" text={formatCost(weeklyUsage.totalCost)} />
         <List.Item.Detail.Metadata.Label title="Cost per MTok" text={costPerMTok} />
         <List.Item.Detail.Metadata.Separator />
-
-        <List.Item.Detail.Metadata.Label title="Efficiency Metrics" />
         <List.Item.Detail.Metadata.Label title="Output/Input Ratio" text={efficiency} />
 
         {previousWeekData && (
           <>
             <List.Item.Detail.Metadata.Separator />
-            <List.Item.Detail.Metadata.Label title="Week-over-Week" text={previousWeekData.week} />
+            <List.Item.Detail.Metadata.Label title="Compared With" text={previousWeekData.week} />
             <List.Item.Detail.Metadata.Label
-              title="Cost Delta"
+              title="Cost Change"
               text={formatCostDelta(weeklyUsage.totalCost, previousWeekData.totalCost)}
               icon={
                 weeklyUsage.totalCost === previousWeekData.totalCost
@@ -91,7 +77,7 @@ export function WeeklyUsage() {
               }
             />
             <List.Item.Detail.Metadata.Label
-              title="Token Delta"
+              title="Token Change"
               text={formatTokenDelta(weeklyUsage.totalTokens, previousWeekData.totalTokens)}
             />
           </>

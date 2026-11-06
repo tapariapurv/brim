@@ -56,7 +56,7 @@ export function CostAnalysis() {
           : STANDARD_ACCESSORIES.NO_DATA
         : !totalUsage
           ? STANDARD_ACCESSORIES.NO_DATA
-          : [{ text: formatCost(totalUsage.totalCost), icon: Icon.Coins }];
+          : [{ text: formatCost(totalUsage.totalCost) }];
   const renderDetailMetadata = (): ReactNode => {
     const errorMetadata = ErrorMetadata({
       error: !totalUsage ? totalError : undefined,
@@ -76,24 +76,15 @@ export function CostAnalysis() {
     return (
       <List.Item.Detail.Metadata>
         {totalError && <List.Item.Detail.Metadata.Label title="Refresh Error" text={totalError.message} />}
-        <List.Item.Detail.Metadata.Label
-          title="Cost Overview"
-          text={formatCost(totalUsage.totalCost)}
-          icon={Icon.Coins}
-        />
+        <List.Item.Detail.Metadata.Label title="Cost Overview" text={formatCost(totalUsage.totalCost)} />
         <List.Item.Detail.Metadata.Separator />
-
-        <List.Item.Detail.Metadata.Label title="Daily vs Total" />
         <List.Item.Detail.Metadata.Label
           title="Today's Cost"
           text={dailyUsage ? formatCost(dailyUsage.totalCost) : dailyLoading ? "Loading…" : "No data"}
         />
         {dailyUsage && <List.Item.Detail.Metadata.Label title="Today's % of Total" text={dailyCostPercentage} />}
         {dailyError && <List.Item.Detail.Metadata.Label title="Daily Usage Error" text={dailyError.message} />}
-        <List.Item.Detail.Metadata.Label title="Total Cost" text={formatCost(totalUsage.totalCost)} />
         <List.Item.Detail.Metadata.Separator />
-
-        <List.Item.Detail.Metadata.Label title="Cost Efficiency" />
         <List.Item.Detail.Metadata.Label
           title="Cost per MTok"
           text={getCostPerMTok(totalUsage.totalCost, totalUsage.totalTokens)}
@@ -107,8 +98,6 @@ export function CostAnalysis() {
           text={getCostPerMTok(totalUsage.totalCost, totalUsage.outputTokens)}
         />
         <List.Item.Detail.Metadata.Separator />
-
-        <List.Item.Detail.Metadata.Label title="Projections" />
         <List.Item.Detail.Metadata.Label title="Daily Average" text={formatCost(dailyAverage)} />
         <List.Item.Detail.Metadata.Label title="Projected Monthly" text={formatCost(projectedMonthlyCost)} />
         <List.Item.Detail.Metadata.Separator />
@@ -128,7 +117,6 @@ export function CostAnalysis() {
             key={`cost-${model.model || "unknown"}-${index}`}
             title={model.model || "Unknown Model"}
             text={`${formatCost(model.totalCost)} (${model.percentage})`}
-            icon={Icon.Star}
           />
         ))}
 
@@ -141,7 +129,6 @@ export function CostAnalysis() {
                 key={`token-${model.model || "unknown"}-${index}`}
                 title={model.model || "Unknown Model"}
                 text={`${formatTokens(model.tokens)} (${model.percentage})`}
-                icon={Icon.Text}
               />
             ))}
           </>

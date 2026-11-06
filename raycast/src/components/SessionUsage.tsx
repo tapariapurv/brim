@@ -34,8 +34,8 @@ export function SessionUsage() {
       : sessions.length === 0 && isLoading
         ? STANDARD_ACCESSORIES.LOADING
         : !sessions || sessions.length === 0
-          ? [{ text: "No sessions", icon: Icon.Circle }]
-          : [{ text: `${sessions.length} sessions`, icon: Icon.List }];
+          ? [{ text: "No sessions" }]
+          : [{ text: `${sessions.length} sessions` }];
   const renderDetailMetadata = (): ReactNode => {
     const errorMetadata = ErrorMetadata({
       error: sessions.length === 0 ? error : undefined,
@@ -52,19 +52,9 @@ export function SessionUsage() {
     return (
       <List.Item.Detail.Metadata>
         {error && <List.Item.Detail.Metadata.Label title="Refresh Error" text={error.message} />}
-        <List.Item.Detail.Metadata.Label
-          title="Recent Sessions"
-          text={`${sessions.length} sessions`}
-          icon={Icon.List}
-        />
-        <List.Item.Detail.Metadata.Separator />
-
-        <List.Item.Detail.Metadata.Label title="Session Statistics" />
         <List.Item.Detail.Metadata.Label title="Average Cost per Session" text={formatCost(averageCost)} />
         <List.Item.Detail.Metadata.Label title="Average Tokens per Session" text={formatTokens(averageTokens)} />
         <List.Item.Detail.Metadata.Separator />
-
-        <List.Item.Detail.Metadata.Label title="Efficiency Metrics" />
         <List.Item.Detail.Metadata.Label
           title="Avg Input/Output Ratio"
           text={`${efficiency.averageInputOutputRatio.toFixed(2)}x`}

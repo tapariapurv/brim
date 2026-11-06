@@ -36,7 +36,7 @@ export function MonthlyUsage() {
         ? isLoading
           ? STANDARD_ACCESSORIES.LOADING
           : STANDARD_ACCESSORIES.NO_DATA
-        : [{ text: formatCost(monthlyUsage.totalCost), icon: Icon.Coins }];
+        : [{ text: formatCost(monthlyUsage.totalCost) }];
 
   const renderDetailMetadata = (): ReactNode => {
     if (!monthlyUsage) {
@@ -46,40 +46,26 @@ export function MonthlyUsage() {
     return (
       <List.Item.Detail.Metadata>
         {error && <List.Item.Detail.Metadata.Label title="Refresh Error" text={error.message} />}
-        <List.Item.Detail.Metadata.Label title="Month" text={monthlyUsage.month} icon={Icon.Calendar} />
+        <List.Item.Detail.Metadata.Label title="Month" text={monthlyUsage.month} />
         {monthlyUsage.metadata?.agents && monthlyUsage.metadata.agents.length > 1 && (
-          <List.Item.Detail.Metadata.Label
-            title="Agents"
-            text={monthlyUsage.metadata.agents.join(", ")}
-            icon={Icon.PersonCircle}
-          />
+          <List.Item.Detail.Metadata.Label title="Agents" text={monthlyUsage.metadata.agents.join(", ")} />
         )}
         <List.Item.Detail.Metadata.Separator />
-
-        <List.Item.Detail.Metadata.Label title="Token Usage" />
         <List.Item.Detail.Metadata.Label title="Input Tokens" text={formatTokens(monthlyUsage.inputTokens)} />
         <List.Item.Detail.Metadata.Label title="Output Tokens" text={formatTokens(monthlyUsage.outputTokens)} />
         <List.Item.Detail.Metadata.Label title="Total Tokens" text={formatTokens(monthlyUsage.totalTokens)} />
         <List.Item.Detail.Metadata.Separator />
-
-        <List.Item.Detail.Metadata.Label title="Cost Analysis" />
-        <List.Item.Detail.Metadata.Label
-          title="Total Cost"
-          text={formatCost(monthlyUsage.totalCost)}
-          icon={Icon.Coins}
-        />
+        <List.Item.Detail.Metadata.Label title="Total Cost" text={formatCost(monthlyUsage.totalCost)} />
         <List.Item.Detail.Metadata.Label title="Cost per MTok" text={costPerMTok} />
         <List.Item.Detail.Metadata.Separator />
-
-        <List.Item.Detail.Metadata.Label title="Efficiency Metrics" />
         <List.Item.Detail.Metadata.Label title="Output/Input Ratio" text={efficiency} />
 
         {previousMonthData && (
           <>
             <List.Item.Detail.Metadata.Separator />
-            <List.Item.Detail.Metadata.Label title="Month-over-Month" text={previousMonthData.month} />
+            <List.Item.Detail.Metadata.Label title="Compared With" text={previousMonthData.month} />
             <List.Item.Detail.Metadata.Label
-              title="Cost Delta"
+              title="Cost Change"
               text={formatCostDelta(monthlyUsage.totalCost, previousMonthData.totalCost)}
               icon={
                 monthlyUsage.totalCost === previousMonthData.totalCost
@@ -91,7 +77,7 @@ export function MonthlyUsage() {
               }
             />
             <List.Item.Detail.Metadata.Label
-              title="Token Delta"
+              title="Token Change"
               text={formatTokenDelta(monthlyUsage.totalTokens, previousMonthData.totalTokens)}
             />
           </>

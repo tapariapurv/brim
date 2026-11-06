@@ -39,7 +39,7 @@ export function DailyUsage() {
         ? isLoading
           ? STANDARD_ACCESSORIES.LOADING
           : STANDARD_ACCESSORIES.NO_DATA
-        : [{ text: formatCost(dailyUsage.totalCost), icon: Icon.Coins }];
+        : [{ text: formatCost(dailyUsage.totalCost) }];
 
   const renderDetailMetadata = (): ReactNode => {
     if (!dailyUsage) {
@@ -56,36 +56,26 @@ export function DailyUsage() {
     return (
       <List.Item.Detail.Metadata>
         {error && <List.Item.Detail.Metadata.Label title="Refresh Error" text={error.message} />}
-        <List.Item.Detail.Metadata.Label title="Date" text={dailyUsage.date} icon={Icon.Calendar} />
+        <List.Item.Detail.Metadata.Label title="Date" text={dailyUsage.date} />
         {dailyUsage.metadata?.agents && dailyUsage.metadata.agents.length > 1 && (
-          <List.Item.Detail.Metadata.Label
-            title="Agents"
-            text={dailyUsage.metadata.agents.join(", ")}
-            icon={Icon.PersonCircle}
-          />
+          <List.Item.Detail.Metadata.Label title="Agents" text={dailyUsage.metadata.agents.join(", ")} />
         )}
         <List.Item.Detail.Metadata.Separator />
-
-        <List.Item.Detail.Metadata.Label title="Token Usage" />
         <List.Item.Detail.Metadata.Label title="Input Tokens" text={formatTokens(dailyUsage.inputTokens)} />
         <List.Item.Detail.Metadata.Label title="Output Tokens" text={formatTokens(dailyUsage.outputTokens)} />
         <List.Item.Detail.Metadata.Label title="Total Tokens" text={formatTokens(dailyUsage.totalTokens)} />
         <List.Item.Detail.Metadata.Separator />
-
-        <List.Item.Detail.Metadata.Label title="Cost Analysis" />
-        <List.Item.Detail.Metadata.Label title="Total Cost" text={formatCost(dailyUsage.totalCost)} icon={Icon.Coins} />
+        <List.Item.Detail.Metadata.Label title="Total Cost" text={formatCost(dailyUsage.totalCost)} />
         <List.Item.Detail.Metadata.Label title="Cost per MTok" text={costPerMTok} />
         <List.Item.Detail.Metadata.Separator />
-
-        <List.Item.Detail.Metadata.Label title="Efficiency Metrics" />
         <List.Item.Detail.Metadata.Label title="Output/Input Ratio" text={efficiency} />
 
         {previousDayData && dailyUsage && (
           <>
             <List.Item.Detail.Metadata.Separator />
-            <List.Item.Detail.Metadata.Label title="Day-over-Day" text={previousDayData.date} />
+            <List.Item.Detail.Metadata.Label title="Compared With" text={previousDayData.date} />
             <List.Item.Detail.Metadata.Label
-              title="Cost Delta"
+              title="Cost Change"
               text={formatCostDelta(dailyUsage.totalCost, previousDayData.totalCost)}
               icon={
                 dailyUsage.totalCost === previousDayData.totalCost
@@ -97,7 +87,7 @@ export function DailyUsage() {
               }
             />
             <List.Item.Detail.Metadata.Label
-              title="Token Delta"
+              title="Token Change"
               text={formatTokenDelta(dailyUsage.totalTokens, previousDayData.totalTokens)}
             />
           </>
@@ -110,7 +100,7 @@ export function DailyUsage() {
     <List.Item
       id="today"
       title="Today"
-      icon={Icon.Calendar}
+      icon={Icon.Sun}
       accessories={accessories}
       detail={<List.Item.Detail isLoading={isLoading} metadata={renderDetailMetadata()} />}
       actions={<StandardActions externalLinks={externalLinks} />}
