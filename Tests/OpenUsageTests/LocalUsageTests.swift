@@ -1,3 +1,4 @@
+import SQLite3
 import XCTest
 @testable import OpenUsage
 
@@ -5,6 +6,34 @@ final class LocalUsageTests: XCTestCase {
     private let now = Date(timeIntervalSince1970: 1_800_000_000)
     private var utc: Calendar { var c = Calendar(identifier: .gregorian); c.timeZone = .gmt; return c }
     private var stamp: String { ISO8601DateFormatter().string(from: now) }
+
+    func testOpenCodeReadsAssistantMessagesSinceTheStartOfTheSpan() throws {
+        let file = FileManager.default.temporaryDirectory.appending(path: "\(UUID()).db")
+        defer { try? FileManager.default.removeItem(at: file) }
+        var db: OpaquePointer?
+        XCTAssertEqual(sqlite3_open(file.path, &db), SQLITE_OK)
+        let at = Int(now.timeIntervalSince1970 * 1_000)
+        let row = #"{"role":"assistant","modelID":"m","cost":0.5,"time":{"created":\#(at)},"tokens":{"input":1,"output":2,"reasoning":3,"cache":{"read":4,"write":5}}}"#
+        let old = #"{"role":"assistant","modelID":"m","cost":0,"time":{"created":1},"tokens":{"input":9}}"#
+        let user = #"{"role":"user","time":{"created":\#(at)}}"#
+        let sql = "CREATE TABLE message (data TEXT); INSERT INTO message VALUES ('\(row)'), ('\(old)'), ('\(user)');"
+        XCTAssertEqual(sqlite3_exec(db, sql, nil, nil, nil), SQLITE_OK)
+        sqlite3_close(db)
+
+        let entries = LocalUsageReader.readOpenCode(at: file, since: now.addingTimeInterval(-60))
+        let entry = try XCTUnwrap(entries.first)
+        XCTAssertEqual(entries.count, 1)
+        XCTAssertEqual([entry.input, entry.output, entry.cacheRead, entry.cacheWrite], [1, 5, 4, 5])
+        XCTAssertEqual(entry.reportedCost, 0.5)
+        let day = LocalUsageReader.aggregate(entries, since: .distantPast, prices: [:], calendar: utc)[utc.startOfDay(for: now)]
+        XCTAssertEqual(day?.totals[.estimatedSpend], 0.5)
+    }
+
+    func testLocalOnlyParsesSavedProviders() throws {
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: "\(UUID())"))
+        defaults.set("opencode,claude,nonsense", forKey: LocalUsageReader.localOnlyKey)
+        XCTAssertEqual(LocalUsageReader.localOnlyKinds(in: defaults), [.claude, .opencodeGo])
+    }
 
     func testClaudeCountsARepeatedMessageOnceAndSplitsCacheTiers() throws {
         let line = #"{"type":"assistant","timestamp":"\#(stamp)","requestId":"r","message":{"id":"m","model":"claude-x-20250101","usage":{"input_tokens":10,"output_tokens":20,"cache_read_input_tokens":30,"cache_creation_input_tokens":40,"cache_creation":{"ephemeral_1h_input_tokens":15}}}}"#

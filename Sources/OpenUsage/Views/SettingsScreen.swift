@@ -16,6 +16,7 @@ struct SettingsScreen: View {
     @AppStorage(LogLevelSetting.key) private var logLevel = LogLevelSetting.info
     @AppStorage(BackdropStyle.key) private var backdrop = BackdropStyle.liquid
     @AppStorage(LocalUsageReader.enabledKey) private var useLocalUsage = true
+    @AppStorage(LocalUsageReader.localOnlyKey) private var localOnly = ""
     @AppStorage(RefreshSetting.key) private var refreshMinutes = RefreshSetting.defaultMinutes
     @State private var claudeFeed = ClaudeFeedInstaller()
     @State private var launchAtLogin = LaunchAtLoginSetting()
@@ -87,18 +88,33 @@ struct SettingsScreen: View {
             ))
             SettingsNote("Reads Claude limits from Claude Code with no request to Anthropic, so they can't get blocked. Adds a status line to Claude Code. Use it when one Claude login is added here and Claude Code uses it too. Without it, Claude asks Anthropic at most every 5 minutes.")
             if let error = claudeFeed.errorMessage { SettingsNote(error, isWarning: true) }
-            Toggle("Use Local Claude And Codex Logs", isOn: $useLocalUsage)
-            SettingsNote("Shows usage from this Mac's logs for a provider you haven't signed in to, and when a signed-in read fails. Costs marked est. are those logs at public API rates.")
         }
         .onChange(of: refreshMinutes) { container.restartRefreshing() }
+        Section("Local Tracking") {
+            Toggle("Use Local Logs", isOn: $useLocalUsage)
+            ForEach(LocalUsageReader.kinds, id: \.self) { kind in
+                Toggle("\(kind.displayName) Local Only", isOn: localOnlyBinding(kind))
+                    .disabled(!useLocalUsage)
+            }
+            SettingsNote("Local logs show usage for a provider you haven't signed in to, and step in when a signed-in read fails. Local Only reads just this Mac's logs for that provider, and keeps any signed-in account saved but unused. Costs marked est. are those logs at public API rates.")
+        }
         .onChange(of: useLocalUsage) { container.localUsageSettingChanged() }
+        .onChange(of: localOnly) { container.localUsageSettingChanged() }
         Section {
             ForEach(dataStore.accounts(in: layout.displayGroups)) { account in
-                ForEach(account.lines.filter(\.isVisible)) { line in
-                    Toggle("\(account.provider.fullName) · \(line.data.title)", isOn: Binding(
-                        get: { dataStore.menuBarMetricIDs.contains(line.id) },
-                        set: { dataStore.setMetric(line.id, inMenuBar: $0) }
-                    ))
+                let lines = account.lines.filter(\.isVisible)
+                if !lines.isEmpty {
+                    DisclosureGroup {
+                        ForEach(lines) { line in
+                            Toggle(line.data.title, isOn: Binding(
+                                get: { dataStore.menuBarMetricIDs.contains(line.id) },
+                                set: { dataStore.setMetric(line.id, inMenuBar: $0) }
+                            ))
+                        }
+                    } label: {
+                        let shown = lines.filter { dataStore.menuBarMetricIDs.contains($0.id) }.count
+                        LabeledContent(account.provider.fullName, value: shown == 0 ? "None" : "\(shown) Shown")
+                    }
                 }
             }
         } header: {
@@ -106,6 +122,17 @@ struct SettingsScreen: View {
         } footer: {
             SettingsNote("With none chosen, the menu bar shows the limits closest to running out.")
         }
+    }
+
+    private func localOnlyBinding(_ kind: ProviderKind) -> Binding<Bool> {
+        Binding(
+            get: { LocalUsageReader.localOnlyKinds(in: .standard).contains(kind) },
+            set: { isOn in
+                var kinds = LocalUsageReader.localOnlyKinds(in: .standard)
+                if isOn { kinds.insert(kind) } else { kinds.remove(kind) }
+                localOnly = kinds.map(\.rawValue).sorted().joined(separator: ",")
+            }
+        )
     }
 
     @ViewBuilder

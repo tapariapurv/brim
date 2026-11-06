@@ -2,6 +2,7 @@ import AppKit
 
 @MainActor
 public final class AppDelegate: NSObject, NSApplicationDelegate {
+    private let updater = UpdaterController()
     private let processStartedAt = ProcessInfo.processInfo.systemUptime
     private var container: AppContainer?
     private var statusItemController: StatusItemController?
@@ -34,7 +35,8 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         self.container = container
         container.startRefreshing()
         Task { await APIKeyV1Files.importOnce(into: container.accounts) }
-        statusItemController = StatusItemController(container: container)
+        statusItemController = StatusItemController(container: container, updater: updater)
+        updater.start()
         let launchDurationMS = Int((ProcessInfo.processInfo.systemUptime - processStartedAt) * 1_000)
         AppLog.info(.lifecycle, "launch to status item ready: \(launchDurationMS) ms")
     }

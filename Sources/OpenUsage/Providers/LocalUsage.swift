@@ -1,11 +1,13 @@
 import Foundation
+import SQLite3
 
-/// Reads what Claude Code and Codex log on this Mac: tokens by model, plus Codex's limits and the Claude
+/// Reads what Claude Code, Codex and OpenCode log on this Mac: tokens by model, plus Codex's limits and the Claude
 /// Code Live Feed. It backs an account that isn't signed in, stands in when a signed-in read fails, and
 /// prices tokens at the public API rates in LiteLLM's table. Those costs are estimates, labelled as such.
 actor LocalUsageReader {
     static let enabledKey = "useLocalUsage"
-    static let kinds: [ProviderKind] = [.claude, .codex]
+    static let localOnlyKey = "localOnlyProviders"
+    static let kinds: [ProviderKind] = [.claude, .codex, .opencodeGo]
     static let pricesURL = URL(string: "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json")!
     private static let pricesMaxAge: TimeInterval = 24 * 60 * 60
 
@@ -17,6 +19,8 @@ actor LocalUsageReader {
         var cacheWrite = 0.0
         var cacheWrite1h = 0.0
         var output = 0.0
+        /// What the tool itself recorded spending. Wins over the price table when there is one.
+        var reportedCost: Double?
         var tokens: Double { input + cacheRead + cacheWrite + cacheWrite1h + output }
     }
 
@@ -65,6 +69,7 @@ actor LocalUsageReader {
         switch kind {
         case .claude: home.appending(path: ".claude/projects")
         case .codex: home.appending(path: ".codex/sessions")
+        case .opencodeGo: home.appending(path: ".local/share/opencode/opencode.db")
         default: nil
         }
     }
@@ -74,11 +79,17 @@ actor LocalUsageReader {
         switch kind {
         case .claude: UUID(uuidString: "B1000000-0000-4000-8000-000000000001")
         case .codex: UUID(uuidString: "B1000000-0000-4000-8000-000000000002")
+        case .opencodeGo: UUID(uuidString: "B1000000-0000-4000-8000-000000000003")
         default: nil
         }
     }
 
     static func isLocal(_ account: Account) -> Bool { account.id == accountID(account.kind) }
+
+    /// Providers the user wants read from this Mac alone. Their signed-in accounts stay saved but unused.
+    nonisolated static func localOnlyKinds(in defaults: UserDefaults) -> Set<ProviderKind> {
+        Set((defaults.string(forKey: localOnlyKey) ?? "").split(separator: ",").compactMap { ProviderKind(rawValue: String($0)) })
+    }
 
     /// A signed-in account reads better than the logs, so logs only get their own card without one.
     nonisolated static func accounts(besides signedIn: [Account], home: URL = .homeDirectory) -> [Account] {
@@ -118,12 +129,15 @@ actor LocalUsageReader {
     /// Tokens and estimated cost by day. Tokens from a model the table doesn't list are counted but not priced.
     func days(_ kind: ProviderKind, count: Int, now: Date, calendar: Calendar) async -> [Date: UsageDay] {
         await refreshPrices(now: now)
+        let earliest = calendar.date(byAdding: .day, value: 1 - count, to: calendar.startOfDay(for: now)) ?? now
+        if kind == .opencodeGo, let file = Self.logRoot(kind, home: home) {
+            return Self.aggregate(Self.readOpenCode(at: file, since: earliest), since: earliest, prices: prices, calendar: calendar)
+        }
         scan(kind, days: count + 1, now: now)
         let root = Self.logRoot(kind, home: home)?.path ?? ""
         let files = scanned.filter { $0.key.hasPrefix(root) }.values
         var keyed: [String: Entry] = [:]
         for file in files { keyed.merge(file.keyed) { _, newer in newer } }
-        let earliest = calendar.date(byAdding: .day, value: 1 - count, to: calendar.startOfDay(for: now)) ?? now
         return Self.aggregate(Array(keyed.values) + files.flatMap(\.unkeyed), since: earliest, prices: prices, calendar: calendar)
     }
 
@@ -137,7 +151,9 @@ actor LocalUsageReader {
             totals.values[.cacheReadTokens, default: 0] += entry.cacheRead
             totals.values[.cacheWriteTokens, default: 0] += entry.cacheWrite + entry.cacheWrite1h
             totals.values[.outputTokens, default: 0] += entry.output
-            if let price = price(for: entry.model, in: prices) {
+            if let cost = entry.reportedCost {
+                totals.values[.estimatedSpend, default: 0] += cost
+            } else if let price = price(for: entry.model, in: prices) {
                 totals.values[.estimatedSpend, default: 0] += price.cost(of: entry)
             }
             days[start] = UsageDay(totals: totals)
@@ -238,6 +254,48 @@ actor LocalUsageReader {
                 : Self.parseCodex(data, modified: modified, size: size)
         }
         for path in scanned.keys where path.hasPrefix(root.path) && !seen.contains(path) { scanned[path] = nil }
+    }
+
+    /// OpenCode keeps its messages in SQLite. Only the `message` table is read, never its credential tables.
+    /// ponytail: re-queries the whole span each refresh. Fine at this size; cache by mtime if it ever isn't.
+    static func readOpenCode(at file: URL, since earliest: Date) -> [Entry] {
+        var db: OpaquePointer?
+        defer { sqlite3_close(db) }
+        guard FileManager.default.fileExists(atPath: file.path) else { return [] }
+        guard sqlite3_open_v2(file.path, &db, SQLITE_OPEN_READONLY, nil) == SQLITE_OK else {
+            AppLog.warn(LogTag.plugin("local"), "couldn't open OpenCode's database")
+            return []
+        }
+        let sql = """
+            SELECT json_extract(data, '$.time.created'), json_extract(data, '$.modelID'),
+                   json_extract(data, '$.tokens.input'), json_extract(data, '$.tokens.cache.read'),
+                   json_extract(data, '$.tokens.cache.write'), json_extract(data, '$.tokens.output'),
+                   json_extract(data, '$.tokens.reasoning'), json_extract(data, '$.cost')
+            FROM message
+            WHERE json_extract(data, '$.role') = 'assistant' AND json_extract(data, '$.time.created') >= ?
+            """
+        var query: OpaquePointer?
+        defer { sqlite3_finalize(query) }
+        guard sqlite3_prepare_v2(db, sql, -1, &query, nil) == SQLITE_OK else {
+            AppLog.warn(LogTag.plugin("local"), "OpenCode's database has an unexpected layout")
+            return []
+        }
+        sqlite3_bind_double(query, 1, earliest.timeIntervalSince1970 * 1_000)
+        var entries: [Entry] = []
+        while sqlite3_step(query) == SQLITE_ROW {
+            let cost = sqlite3_column_double(query, 7)
+            entries.append(Entry(
+                at: Date(timeIntervalSince1970: sqlite3_column_double(query, 0) / 1_000),
+                model: sqlite3_column_text(query, 1).map { String(cString: $0) } ?? "",
+                input: sqlite3_column_double(query, 2),
+                cacheRead: sqlite3_column_double(query, 3),
+                cacheWrite: sqlite3_column_double(query, 4),
+                // Unlike Codex, OpenCode counts reasoning apart from output.
+                output: sqlite3_column_double(query, 5) + sqlite3_column_double(query, 6),
+                reportedCost: cost > 0 ? cost : nil
+            ))
+        }
+        return entries
     }
 
     private static func forEachLine(in data: Data, containing needles: [String], _ body: ([String: Any]) -> Void) {

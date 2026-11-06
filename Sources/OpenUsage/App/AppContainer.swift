@@ -170,10 +170,13 @@ final class AppContainer {
         startRefreshing()
     }
 
-    /// Signed-in accounts, plus a card from the local logs for each provider that has none.
+    /// Signed-in accounts, plus a card from the local logs for each provider that has none or is set to Local Only.
     private static func catalogAccounts(_ store: AccountStore, localUsage: LocalUsageReader?, defaults: UserDefaults) -> [Account] {
         let useLogs = localUsage != nil && defaults.object(forKey: LocalUsageReader.enabledKey) as? Bool ?? true
-        return store.accounts + (useLogs ? LocalUsageReader.accounts(besides: store.accounts) : [])
+        guard useLogs else { return store.accounts }
+        let localOnly = LocalUsageReader.localOnlyKinds(in: defaults)
+        let signedIn = store.accounts.filter { !localOnly.contains($0.kind) }
+        return signedIn + LocalUsageReader.accounts(besides: signedIn)
     }
 
     func localUsageSettingChanged() {

@@ -92,6 +92,7 @@ class MenuBarPanel: NSPanel {
 @MainActor
 final class StatusItemController: NSObject {
     private let container: AppContainer
+    private let updater: UpdaterController
     private let statusItem: NSStatusItem
     private var stripGate = StripGate()
     private var rankingTick: Task<Void, Never>?
@@ -106,8 +107,9 @@ final class StatusItemController: NSObject {
     )
     private let host: NSHostingView<AnyView>
 
-    init(container: AppContainer) {
+    init(container: AppContainer, updater: UpdaterController) {
         self.container = container
+        self.updater = updater
         let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         self.statusItem = statusItem
 
@@ -116,6 +118,7 @@ final class StatusItemController: NSObject {
                 DashboardView()
                     .reduceAnimationsWhenRequested()
                     .environment(container)
+                    .environment(updater)
                     .environment(container.layout)
                     .environment(container.dataStore)
                     .environment(container.renaming)
@@ -205,6 +208,7 @@ final class StatusItemController: NSObject {
             let limit = concealing ? .iconOnly : container.dataStore.menuBarLimit
             let chosen = concealing ? [] : container.dataStore.menuBarMetricIDs
             let accounts = limit == .iconOnly && chosen.isEmpty ? [] : container.dataStore.accounts(in: container.layout.displayGroups)
+            _ = updater.availableUpdateVersion
             return (accounts, container.dataStore.burningFast, limit, chosen)
         } onChange: { [weak self] in
             Task { @MainActor [weak self] in
@@ -221,10 +225,11 @@ final class StatusItemController: NSObject {
         let board = PriorityBoard.make(accounts: accounts, burningFast: burningFast, now: now)
         // A chosen metric can have no reading yet, or belong to a removed account: don't go blank over it.
         let picked = MenuBarContentBuilder.build(accounts: accounts, chosen: chosen)
-        let content = MenuBarContentBuilder.includingSession(
+        var content = MenuBarContentBuilder.includingSession(
             picked.isEmpty ? MenuBarContentBuilder.build(board: board, limit: limit) : picked,
             accounts: accounts
         )
+        content.updateAvailable = updater.availableUpdateVersion != nil
         stripGate.show(content) { content in
             statusItem.button?.image = MenuBarStripRenderer.image(for: content)
                 ?? MenuBarStripRenderer.appIcon

@@ -22,7 +22,7 @@ project rules to CLAUDE.md.
   Keychain service.
 - Users initiate all provider sign-ins from the popover's Accounts screen. Never discover credentials
   or accounts from other tools, and never read their files, Keychain items, SQLite databases, or
-  environment variables. Two exceptions: the opt-in Claude Code Live Feed (its status line writes Brim's own `~/.brim/claude-feed.json`, and turning it on edits Claude Code's `statusLine` setting), and `LocalUsageReader`, which reads Claude Code's and Codex's usage logs but never credentials.
+  environment variables. Two exceptions: the opt-in Claude Code Live Feed (its status line writes Brim's own `~/.brim/claude-feed.json`, and turning it on edits Claude Code's `statusLine` setting), and `LocalUsageReader`, which reads Claude Code's and Codex's usage logs and the `message` table of OpenCode's database, but never credentials.
 - Each account has one provider runtime. The runtime calls the provider API and maps its response to
   dashboard metrics. Log scanning and estimates live only in `LocalUsageReader`, and every estimate is labelled
   `est.`; the other pricing is ChatGPT's credits, at 4¢ each in `CodexUsageMapper`.

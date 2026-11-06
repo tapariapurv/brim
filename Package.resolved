@@ -1,5 +1,5 @@
 {
-  "originHash" : "6a659dad54f13fa55a43ee25eaf9a0cd31ee0748be821bb7bc100b82f7eb63ff",
+  "originHash" : "d9cdf4ab032186e53e6d05e876a9789ba1cfbc0a1e3ef4c9c4c1b7194d4d0dc2",
   "pins" : [
     {
       "identity" : "keyboardshortcuts",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "772133d9dbe800fdac0473226822994c5c162c58",
         "version" : "3.1.0"
+      }
+    },
+    {
+      "identity" : "sparkle",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/sparkle-project/Sparkle",
+      "state" : {
+        "revision" : "ab7d71291238df6e0492143b120c9b696a35f603",
+        "version" : "2.10.1"
       }
     }
   ],

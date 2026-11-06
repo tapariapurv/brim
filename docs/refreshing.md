@@ -76,9 +76,10 @@ The interval is yours to set in Settings > General. Claude reads are spaced and 
 
 ## Local logs
 
-Claude Code's `~/.claude/projects` and Codex's `~/.codex/sessions` give Brim tokens by model, and Codex's also give its limits. Claude's limits need the Live Feed.
+Claude Code's `~/.claude/projects`, Codex's `~/.codex/sessions` and OpenCode's `~/.local/share/opencode/opencode.db` (its messages only, never its credentials) give Brim tokens by model, and Codex's also give its limits. Claude's limits need the Live Feed. OpenCode's logs have no limits, only tokens and the cost it recorded.
 
 - A provider with no signed-in account gets a card labelled Local. The first read of a large log folder can take a while; later reads only open changed files.
 - When a signed-in read fails, Brim shows the logs' limits and says so on the account.
 - Costs marked `est.` are tokens at LiteLLM's public API rates, refreshed daily to `~/.brim/model-prices.json`. A model it doesn't list counts toward tokens only.
-- Turn this off with **Use Local Claude And Codex Logs** in Settings → General.
+- **Local Only** for a provider in Settings → General → Local Tracking reads just its logs. A signed-in account stays saved and comes back when you turn this off.
+- Turn all of this off with **Use Local Logs** in the same section.

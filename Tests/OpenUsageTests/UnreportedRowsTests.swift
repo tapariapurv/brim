@@ -29,6 +29,7 @@ final class UnreportedRowsTests: XCTestCase {
             "claude.today": "0 tokens", "claude.yesterday": "0 tokens", "claude.last30": "0 tokens",
             "codex.today": "0 tokens", "codex.yesterday": "0 tokens", "codex.last30": "0 tokens",
             "cursor.today": "$0 · 0 tokens", "cursor.yesterday": "$0 · 0 tokens", "cursor.last30": "$0 · 0 tokens",
+            "opencode.today": "0 tokens", "opencode.yesterday": "0 tokens", "opencode.last30": "0 tokens",
             "ollama.today": "$0 · 0 tokens", "ollama.yesterday": "$0 · 0 tokens", "ollama.last30": "$0 · 0 tokens",
             "openrouter.today": "$0", "openrouter.yesterday": "$0", "openrouter.week": "$0",
             "openrouter.month": "$0", "openrouter.prior30": "$0",

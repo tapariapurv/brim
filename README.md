@@ -20,7 +20,8 @@ Brim isn't notarized yet. The first time you open it, macOS says it can't verify
 - **Fewer blocked Claude refreshes.** See below.
 - **OpenUsage's look, refined.** Thick pill bars on a near-solid panel, with animated levels and a slide between tabs.
 - **Cost estimates.** Today, yesterday and 30 days for Claude and ChatGPT, from your local logs at [LiteLLM's public API rates](https://github.com/BerriAI/litellm). They show what the same tokens would cost on the API, not what you pay on a plan, and are marked `est.`
-- **No sign-in needed.** Without an account, Brim reads Claude Code's and Codex's local logs. A signed-in account stays the main source, and the logs step in when its read fails.
+- **No sign-in needed.** Without an account, Brim reads Claude Code's, Codex's and OpenCode's local logs. A signed-in account stays the main source, and the logs step in when its read fails. Set a provider to **Local Only** to use just its logs.
+- **Automatic updates.** Brim checks for new releases itself and installs them when you quit or restart it.
 - **Your menu bar.** Choose any metrics in Settings > General > Menu Bar Items, or right-click a metric.
 - **No analytics and no auto-updates.** Brim sends nothing to the original project. Update by rebuilding.
 - **[Raycast extension](raycast/).** Type `cc` in Raycast to open your limits, with current, average and estimated usage.

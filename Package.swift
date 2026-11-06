@@ -12,13 +12,16 @@ let package = Package(
     ],
     dependencies: [
         // The de-facto standard recorder + global hotkey for Mac apps (System Settings-style field).
-        .package(url: "https://github.com/sindresorhus/KeyboardShortcuts", from: "3.0.1")
+        .package(url: "https://github.com/sindresorhus/KeyboardShortcuts", from: "3.0.1"),
+        // In-app auto-updates (appcast + EdDSA-signed downloads).
+        .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.9.4")
     ],
     targets: [
         .target(
             name: "OpenUsage",
             dependencies: [
-                .product(name: "KeyboardShortcuts", package: "KeyboardShortcuts")
+                .product(name: "KeyboardShortcuts", package: "KeyboardShortcuts"),
+                .product(name: "Sparkle", package: "Sparkle")
             ],
             path: "Sources/OpenUsage",
             resources: [

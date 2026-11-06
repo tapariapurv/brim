@@ -145,7 +145,10 @@ extension AccountProviderRuntime {
                 .percent(key: "weekly", provider: provider, title: "Weekly")
                     .exportingLimit("weekly", unit: "percent"),
                 .percent(key: "monthly", provider: provider, title: "Monthly")
-                    .exportingLimit("monthly", unit: "percent")
+                    .exportingLimit("monthly", unit: "percent"),
+                .history(key: "today", provider: provider, .window(.today, .estimatedSpend, then: .tokens)),
+                .history(key: "yesterday", provider: provider, .window(.yesterday, .estimatedSpend, then: .tokens)),
+                .history(key: "last30", provider: provider, .window(.lastDays(30), .estimatedSpend, then: .tokens))
             ]
         case .openrouter:
             [

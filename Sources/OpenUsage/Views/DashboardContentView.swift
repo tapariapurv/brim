@@ -4,6 +4,7 @@ struct DashboardContentView: View {
     @Environment(LayoutStore.self) private var layout
     @Environment(PopoverState.self) private var popover
     @Environment(\.reduceAnimations) private var reduceAnimations
+    @Environment(UpdaterController.self) private var updater: UpdaterController?
     let reorderSpaceName: String
 
     @Binding var reorderLift: ReorderLift?
@@ -14,7 +15,17 @@ struct DashboardContentView: View {
 
     var body: some View {
         PopoverScrollView {
-            widgetContent
+            VStack(alignment: .leading, spacing: 0) {
+                // A pending update found by a scheduled check tops everything: it's the reminder
+                // the buried Sparkle window can't deliver for a dockless app.
+                if let updateVersion = updater?.availableUpdateVersion {
+                    UpdateBannerCard(version: updateVersion)
+                        .padding(.bottom, PanelMetrics.sectionSpacing)
+                        .transition(.scale(scale: 0.95).combined(with: .opacity))
+                }
+                widgetContent
+            }
+            .animation(Motion.spring, value: updater?.availableUpdateVersion)
             .padding(.horizontal, PanelMetrics.margin)
             .padding(.vertical, Self.barGap)
             .frame(maxWidth: .infinity, alignment: .leading)

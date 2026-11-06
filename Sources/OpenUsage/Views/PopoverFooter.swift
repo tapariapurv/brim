@@ -2,6 +2,7 @@ import AppKit
 import SwiftUI
 
 struct PopoverFooter: View {
+    @Environment(UpdaterController.self) private var updater: UpdaterController?
     @Environment(PopoverState.self) private var popover
     @Environment(WidgetDataStore.self) private var dataStore
     @Environment(LayoutStore.self) private var layout
@@ -83,6 +84,13 @@ struct PopoverFooter: View {
                 Label("Settings", systemImage: "gearshape")
             }
             .keyboardShortcut(",")
+
+            Divider()
+
+            Button { updater?.checkForUpdates() } label: {
+                Label("Check for Updates…", systemImage: "arrow.triangle.2.circlepath")
+            }
+            .disabled(updater?.canCheckForUpdates != true)
 
             Divider()
 
